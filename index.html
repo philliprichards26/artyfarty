@@ -117,6 +117,14 @@ select.fi{cursor:pointer}
 .icon-opt{font-size:28px;background:none;border:2px solid transparent;border-radius:8px;padding:4px;cursor:pointer}
 .icon-opt.sel{border-color:var(--amber)}
 .privacy-box{font-size:13px;color:var(--muted);line-height:1.6;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+
+.rebuild-box{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:10px 12px;margin:0 14px 10px;font-size:12px;color:#166534;display:none}
+.rebuild-box.show{display:block}
+.rebuild-prompt{font-family:monospace;font-size:11px;background:#dcfce7;border-radius:6px;padding:8px;margin:6px 0;line-height:1.5;word-break:break-word}
+.copy-prompt-btn{padding:8px 14px;background:#16a34a;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;width:100%;margin-top:4px}
+.attach-indicator{font-size:11px;font-weight:500;margin-top:2px}
+.attach-ok{color:#16a34a}
+.attach-no{color:var(--muted2)}
 </style>
 </head>
 <body>
@@ -275,8 +283,45 @@ function renderHome(){
   const c=document.getElementById('content');
   if(!arts.length){c.innerHTML=`<div class="empty"><div class="empty-icon">${search?'🔍':'📦'}</div><div class="empty-title">${search?'Nothing found':'No artifacts yet'}</div><div class="empty-sub">${search?'Try different keywords':'Tap + to save your first artifact'}</div>${!search?'<button class="empty-btn" onclick="openSheet(\'saveSheet\')">Save first artifact</button>':''}</div>`;return}
   c.innerHTML=`<div class="list-wrap">${arts.map(a=>{
-    const type=typeOf(a.name),pref=(a.versions||[]).find(v=>v.preferred),latest=(a.versions||[])[(a.versions||[]).length-1],isExp=expanded===a.id;
-    return`<div class="card ${isExp?'expanded':''}" id="card-${a.id}"><div class="card-body" onclick="toggleCard(${a.id})"><div class="card-icon">${emojiOf(type)}</div><div class="card-info"><div class="card-name">${a.name}</div>${a.desc?`<div class="card-desc">${a.desc}</div>`:''}<div class="card-meta"><span class="chip chip-type">${type.toUpperCase()}</span><span class="chip chip-v">${(a.versions||[]).length}v</span>${pref?`<span class="chip chip-pref">★ ${pref.v}</span>`:''}<span style="font-size:11px;color:var(--muted2)">${fmtDate(a.createdAt)}</span></div></div><div class="card-right"><button class="star-btn ${a.starred?'on':''}" onclick="event.stopPropagation();toggleStar(${a.id})">${a.starred?'⭐':'☆'}</button><span class="vbadge">${latest?latest.v:'v1'}</span></div></div><div class="card-detail ${isExp?'open':''}" id="det-${a.id}"><div class="vlist">${(a.versions||[]).map((v,i)=>`<div class="vrow"><span class="vtag ${v.preferred?'pref':''}">${v.v}</span><span class="vnote">${v.note||'—'}</span><button class="vstar ${v.preferred?'on':''}" onclick="setPref(${a.id},${i})">${v.preferred?'⭐':'☆'}</button>${v.content?`<button class="vdl" onclick="dlVer(${a.id},${i})">⬇</button>`:''}</div>`).join('')}</div><div class="card-actions"><button class="act-btn" onclick="openAddVer(${a.id})">+ Version</button><button class="act-btn" onclick="openEdit(${a.id})">✏ Edit</button><button class="act-btn danger" onclick="delArt(${a.id})">🗑 Delete</button></div></div></div>`;
+    const type=typeOf(a.name),pref=(a.versions||[]).find(v=>v.preferred),latest=(a.versions||[])[(a.versions||[]).length-1],isExp=expanded===a.id,hasFile=(a.versions||[]).some(v=>v.content&&v.content.length>0);
+    return`<div class="card ${isExp?'expanded':''}" id="card-${a.id}">
+      <div class="card-body" onclick="toggleCard(${a.id})">
+        <div class="card-icon">${emojiOf(type)}</div>
+        <div class="card-info">
+          <div class="card-name">${a.name}</div>
+          ${a.desc?`<div class="card-desc">${a.desc}</div>`:''}
+          <div class="card-meta">
+            <span class="chip chip-type">${type.toUpperCase()}</span>
+            <span class="chip chip-v">${(a.versions||[]).length}v</span>
+            ${pref?`<span class="chip chip-pref">★ ${pref.v}</span>`:''}
+            <span style="font-size:11px;color:var(--muted2)">${fmtDate(a.createdAt)}</span>
+          </div>
+          <div class="attach-indicator ${hasFile?'attach-ok':'attach-no'}">${hasFile?'📎 File attached':'📎 No file'}</div>
+        </div>
+        <div class="card-right">
+          <button class="star-btn ${a.starred?'on':''}" onclick="event.stopPropagation();toggleStar(${a.id})">${a.starred?'⭐':'☆'}</button>
+          <span class="vbadge">${latest?latest.v:'v1'}</span>
+        </div>
+      </div>
+      <div class="card-detail ${isExp?'open':''}" id="det-${a.id}">
+        <div class="vlist">
+          ${(a.versions||[]).map((v,i)=>`<div class="vrow"><span class="vtag ${v.preferred?'pref':''}">${v.v}</span><span class="vnote">${v.note||'—'}</span><button class="vstar ${v.preferred?'on':''}" onclick="setPref(${a.id},${i})">${v.preferred?'⭐':'☆'}</button>${v.content?`<button class="vdl" onclick="dlVer(${a.id},${i})">⬇</button>`:''}</div>`).join('')}
+        </div>
+        <div class="card-actions">
+          <button class="act-btn" onclick="openAddVer(${a.id})">+ Version</button>
+          <button class="act-btn" onclick="openEdit(${a.id})">✏ Edit</button>
+          <button class="act-btn" onclick="triggerAttach(${a.id})">📎 Attach</button>
+          <button class="act-btn" onclick="showRebuild(${a.id})">🤖 Rebuild</button>
+          <button class="act-btn danger" onclick="delArt(${a.id})">🗑</button>
+        </div>
+        <input type="file" id="attach-${a.id}" style="display:none" onchange="attachFile(${a.id},this)">
+        <div class="rebuild-box" id="rebuild-${a.id}">
+          <div style="font-weight:600;margin-bottom:4px">📋 Copy this prompt into Claude:</div>
+          <div class="rebuild-prompt">${buildRebuildPrompt(a)}</div>
+          <button class="copy-prompt-btn" onclick="copyRebuildPrompt(${a.id})">📋 Copy Prompt</button>
+        </div>
+      </div>
+    </div>`;
   }).join('')}</div>`;
 }
 
@@ -446,6 +491,63 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 
 loadFolderSelects();
 switchTab('home');
+
+// ── FILE ATTACH ───────────────────────────────────────────────────────────
+function triggerAttach(id){
+  const inp=document.getElementById('attach-'+id);
+  if(inp)inp.click();
+}
+
+function attachFile(artId,input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const arts=getArts(),a=arts.find(x=>x.id===artId);if(!a)return;
+    // Attach to latest version
+    const latest=a.versions[a.versions.length-1];
+    if(latest){
+      latest.content=e.target.result;
+      latest.fileName=file.name;
+      latest.fileSize=file.size;
+    }
+    setArts(arts);
+    showToast(`📎 "${file.name}" attached`);
+    renderHome();
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+
+// ── REBUILD PROMPT ────────────────────────────────────────────────────────
+function buildRebuildPrompt(a){
+  const pref=(a.versions||[]).find(v=>v.preferred)||a.versions?.[a.versions.length-1];
+  const ver=pref?pref.v:'latest version';
+  const note=pref?.note?` (${pref.note})`:'';
+  return `Please re-send or rebuild "${a.name}" ${ver}${note}. ${a.desc||''}`.trim();
+}
+
+function showRebuild(id){
+  const box=document.getElementById('rebuild-'+id);
+  if(!box)return;
+  box.classList.toggle('show');
+}
+
+function copyRebuildPrompt(id){
+  const a=getArts().find(x=>x.id===id);if(!a)return;
+  const prompt=buildRebuildPrompt(a);
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(prompt).then(()=>showToast('📋 Prompt copied — paste into Claude!')).catch(()=>fallbackCopy(prompt));
+  } else { fallbackCopy(prompt); }
+}
+
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');showToast('📋 Prompt copied!')}catch{showToast('⚠ Copy manually from the box')}
+  document.body.removeChild(ta);
+}
+
 </script>
 </body>
 </html>
