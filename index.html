@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Artifact Manager — Phillip Richards</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #f7f5f1;
+    --surface:    #ffffff;
+    --surface2:   #f2ede6;
+    --surface3:   #ece7de;
+    --border:     #e8e2d8;
+    --border2:    #d5cdc2;
+    --text:       #1c1914;
+    --muted:      #7a7268;
+    --subtle:     #a8a09a;
+    --accent:     #d97757;
+    --accent-dk:  #c26840;
+    --accent-bg:  rgba(217,119,87,.09);
+    --accent-brd: rgba(217,119,87,.28);
+    --green:      #4a9868;
+    --green-bg:   rgba(74,152,104,.08);
+    --green-brd:  rgba(74,152,104,.22);
+    --blue:       #3c79d8;
+    --purple:     #8058c2;
+    --red:        #c54545;
+    --cyan:       #2b9aaa;
+    --tag-bg:     #ede8e0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg); color: var(--text);
+    height: 100vh; display: flex; flex-direction: column;
+    overflow: hidden; -webkit-font-smoothing: antialiased;
+  }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; gap:16px; padding:0 20px; height:52px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+  .topbar-logo { display:flex; align-items:center; gap:9px; font-weight:600; font-size:14px; letter-spacing:-.2px; }
+  .logo-mark, .logo-icon { width:28px; height:28px; background:linear-gradient(145deg,#d97757,#c06040); border-radius:7px; display:flex; align-items:center; justify-content:center; color:white; font-size:13px; flex-shrink:0; box-shadow:0 1px 4px rgba(192,96,64,.22); }
+  .owner-badge { font-size:10.5px; padding:2px 7px; background:var(--accent-bg); color:var(--accent); border-radius:4px; font-weight:600; margin-left:2px; border:1px solid var(--accent-brd); }
+  .topbar-center { flex:1; display:flex; align-items:center; gap:10px; max-width:480px; margin:0 auto; }
+  .search-wrap { position:relative; flex:1; }
+  .search-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:7px 12px 7px 32px; color:var(--text); font-family:inherit; font-size:13px; outline:none; transition:border-color .15s,box-shadow .15s; }
+  .search-input:focus { border-color:var(--accent); background:var(--surface); box-shadow:0 0 0 3px var(--accent-bg); }
+  .search-input::placeholder { color:var(--subtle); }
+  .search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--subtle); pointer-events:none; display:flex; }
+  .topbar-right { display:flex; align-items:center; gap:8px; margin-left:auto; }
+  .btn { padding:6px 13px; border-radius:7px; border:none; font-family:inherit; font-size:12.5px; font-weight:500; cursor:pointer; transition:all .15s; }
+  .btn-primary { background:var(--accent); color:white; }
+  .btn-primary:hover { background:var(--accent-dk); }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .btn-ghost:hover { color:var(--text); border-color:var(--border2); background:var(--surface2); }
+  .avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(145deg,#d97757,#c06040); display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; color:white; flex-shrink:0; }
+
+  /* WORKSPACE */
+  .workspace { display:flex; flex:1; overflow:hidden; }
+
+  /* LOAD SCREEN */
+  .load-screen { flex:1; display:flex; align-items:center; justify-content:center; background:var(--bg); }
+  .load-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:40px 48px; display:flex; flex-direction:column; align-items:center; gap:16px; max-width:420px; text-align:center; box-shadow:0 2px 16px rgba(0,0,0,.06); }
+  .load-icon { width:52px; height:52px; background:linear-gradient(145deg,#d97757,#c06040); border-radius:14px; display:flex; align-items:center; justify-content:center; color:white; font-size:22px; box-shadow:0 4px 14px rgba(192,96,64,.2); }
+  .load-title { font-size:18px; font-weight:700; }
+  .load-desc { font-size:13px; color:var(--muted); line-height:1.65; }
+  .load-btn { padding:10px 24px; border-radius:9px; border:1.5px dashed var(--border2); background:transparent; color:var(--text); font-family:inherit; font-size:13.5px; font-weight:500; cursor:pointer; transition:all .2s; width:100%; }
+  .load-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-bg); }
+  .load-hint { font-size:11px; color:var(--subtle); }
+
+  /* SIDEBAR */
+  .sidebar { width:236px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+  .sidebar-scroll { flex:1; overflow-y:auto; padding:8px 8px 4px; }
+  .sidebar-section { padding:4px 0; }
+  .sidebar-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--subtle); padding:8px 10px 5px; }
+  .nav-item { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:13px; color:var(--muted); transition:all .12s; user-select:none; margin-bottom:1px; }
+  .nav-item:hover { background:var(--surface2); color:var(--text); }
+  .nav-item.active { background:var(--accent-bg); color:var(--accent); font-weight:500; }
+  .nav-item.active .nav-count { background:rgba(217,119,87,.14); color:var(--accent); }
+  .nav-count { margin-left:auto; font-size:10.5px; background:var(--surface2); color:var(--muted); padding:1px 6px; border-radius:10px; min-width:20px; text-align:center; }
+  .starred-nav { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:7px; cursor:pointer; font-size:13px; color:var(--accent); font-weight:500; transition:all .12s; margin-bottom:1px; }
+  .starred-nav:hover { background:var(--accent-bg); }
+  .sidebar-footer { border-top:1px solid var(--border); padding:12px 14px; }
+  .storage-bar-bg { height:3px; background:var(--surface2); border-radius:2px; margin:7px 0 4px; }
+  .storage-bar-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--accent),var(--accent-dk)); }
+  .storage-label { font-size:11px; color:var(--muted); }
+  .detail-section-title { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--subtle); margin-bottom:10px; }
+  .load-new-btn { width:100%; margin-top:5px; padding:5px; border-radius:6px; border:1px dashed var(--border2); background:transparent; color:var(--muted); font-family:inherit; font-size:11px; cursor:pointer; transition:all .15s; }
+  .load-new-btn:hover { border-color:var(--accent-brd); color:var(--accent); }
+
+  /* MAIN */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
+  .main-header { padding:12px 18px 10px; border-bottom:1px solid var(--border); background:var(--surface); flex-shrink:0; }
+  .main-header-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+  .main-title { font-size:15px; font-weight:600; }
+  .main-subtitle { font-size:11.5px; color:var(--muted); margin-top:2px; }
+  .header-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .filter-row { display:flex; align-items:center; gap:4px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; }
+  .filter-row::-webkit-scrollbar { display:none; }
+  .pill { padding:4px 11px; border-radius:20px; font-size:11.5px; border:1px solid var(--border); cursor:pointer; transition:all .12s; color:var(--muted); background:transparent; font-family:inherit; white-space:nowrap; flex-shrink:0; }
+  .pill:hover { border-color:var(--border2); color:var(--text); background:var(--surface2); }
+  .pill.active { border-color:var(--accent-brd); color:var(--accent); background:var(--accent-bg); }
+  .sort-select { background:var(--surface); border:1px solid var(--border); border-radius:7px; color:var(--muted); font-family:inherit; font-size:11.5px; padding:4px 8px; cursor:pointer; outline:none; flex-shrink:0; }
+  .view-toggle { display:flex; gap:2px; background:var(--bg); border:1px solid var(--border); border-radius:7px; padding:2px; }
+  .view-btn { background:none; border:none; cursor:pointer; padding:3px 7px; border-radius:5px; font-size:13px; color:var(--muted); transition:all .12s; }
+  .view-btn.active { background:var(--surface); color:var(--text); box-shadow:0 1px 3px rgba(0,0,0,.06); }
+
+  /* ARTIFACT LIST */
+  .artifact-list { flex:1; overflow-y:auto; padding:10px 14px; }
+  .artifact-list.grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:8px; align-content:start; }
+
+  /* CARDS */
+  .artifact-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; transition:border-color .15s,box-shadow .15s; margin-bottom:5px; }
+  .artifact-card:hover { border-color:var(--border2); box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .artifact-card.expanded { border-color:var(--accent-brd); box-shadow:0 0 0 2px var(--accent-bg); }
+  .card-main { display:flex; align-items:center; gap:11px; padding:11px 13px; cursor:pointer; min-height:60px; }
+  .type-badge { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .type-html{background:rgba(217,119,87,.10);} .type-css{background:rgba(60,121,216,.10);} .type-svg{background:rgba(217,119,87,.10);} .type-xml{background:rgba(128,88,194,.10);}
+  .type-py{background:rgba(74,152,104,.10);} .type-jsx{background:rgba(44,154,170,.10);} .type-tsx{background:rgba(44,154,170,.10);} .type-ts{background:rgba(60,121,216,.10);}
+  .type-js{background:rgba(217,119,87,.10);} .type-vue{background:rgba(74,152,104,.10);} .type-rb{background:rgba(197,68,68,.10);} .type-php{background:rgba(128,88,194,.10);}
+  .type-java{background:rgba(197,68,68,.10);} .type-rs{background:rgba(217,119,87,.10);} .type-go{background:rgba(44,154,170,.10);} .type-sh{background:rgba(74,152,104,.10);}
+  .type-sql{background:rgba(197,68,68,.10);} .type-json{background:rgba(128,88,194,.10);} .type-csv{background:rgba(74,152,104,.10);} .type-yaml{background:rgba(217,119,87,.10);}
+  .type-toml{background:rgba(217,119,87,.10);} .type-md{background:rgba(74,152,104,.10);} .type-txt{background:rgba(160,144,144,.10);} .type-docx{background:rgba(128,88,194,.10);}
+  .type-xlsx{background:rgba(60,121,216,.10);} .type-pptx{background:rgba(197,68,68,.10);} .type-pdf{background:rgba(197,68,68,.10);} .type-zip{background:rgba(197,68,68,.10);}
+  .type-mp4{background:rgba(44,154,170,.10);} .type-mp3{background:rgba(44,154,170,.10);} .type-other{background:rgba(160,144,144,.10);}
+  .card-info { flex:1; min-width:0; overflow:hidden; }
+  .card-name { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; width:100%; }
+  .card-desc { font-size:11px; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .card-meta { display:flex; align-items:center; gap:5px; margin-top:4px; font-size:11px; color:var(--muted); flex-wrap:wrap; min-width:0; }
+  .card-tags { display:flex; gap:3px; flex-wrap:wrap; }
+  .tag { padding:2px 6px; border-radius:4px; background:var(--tag-bg); font-size:10px; color:var(--muted); font-weight:500; }
+  .card-right { display:flex; align-items:center; gap:7px; flex-shrink:0; }
+  .version-count { font-size:11px; color:var(--muted); background:var(--surface2); padding:2px 8px; border-radius:5px; font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+  .star-btn { background:none; border:none; cursor:pointer; font-size:17px; line-height:1; transition:transform .12s,color .12s; padding:2px; color:var(--border2); }
+  .star-btn:hover { transform:scale(1.2); color:var(--accent); }
+  .star-btn.starred { color:var(--accent); }
+  .expand-icon { color:var(--border2); font-size:11px; transition:transform .2s; }
+  .expanded .expand-icon { transform:rotate(180deg); }
+
+  /* VERSION DRAWER */
+  .version-drawer { display:none; border-top:1px solid var(--border); }
+  .version-drawer.open { display:block; }
+  .drawer-header { padding:7px 13px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--subtle); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; background:var(--bg); }
+  .version-row { display:flex; align-items:center; gap:10px; padding:8px 13px; border-bottom:1px solid var(--border); transition:background .12s; background:var(--bg); }
+  .version-row:last-child { border-bottom:none; }
+  .version-row:hover { background:var(--surface2); }
+  .version-tag { font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:600; padding:2px 7px; border-radius:5px; background:var(--surface); border:1px solid var(--border); color:var(--text); min-width:32px; text-align:center; flex-shrink:0; }
+  .version-tag.preferred { background:var(--accent-bg); color:var(--accent); border-color:var(--accent-brd); }
+  .preferred-badge { font-size:10px; padding:2px 6px; border-radius:4px; background:var(--accent-bg); color:var(--accent); font-weight:700; flex-shrink:0; }
+  .version-note { flex:1; font-size:11px; color:var(--muted); font-style:italic; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .version-date { font-size:10.5px; color:var(--subtle); flex-shrink:0; min-width:65px; text-align:right; }
+  .version-star { background:none; border:none; cursor:pointer; font-size:14px; transition:all .15s; padding:2px 3px; border-radius:4px; color:var(--border2); }
+  .version-star:hover { background:var(--accent-bg); color:var(--accent); }
+  .version-star.starred { color:var(--accent); }
+
+  /* CARD ACTIONS */
+  .card-action-row { display:flex; gap:5px; padding:7px 13px 10px; border-top:1px solid var(--border); background:var(--bg); flex-wrap:wrap; }
+  .act-btn { flex:1; min-width:70px; padding:6px 8px; border-radius:7px; border:1px solid var(--border); background:var(--surface); font-size:11.5px; font-weight:500; color:var(--muted); cursor:pointer; font-family:inherit; transition:all .12s; text-align:center; white-space:nowrap; }
+  .act-btn:hover { border-color:var(--border2); color:var(--text); background:var(--surface2); }
+  .act-btn.attach-ok { border-color:var(--green-brd); color:var(--green); }
+  .rebuild-box { display:none; margin:0 13px 10px; background:var(--green-bg); border:1px solid var(--green-brd); border-radius:9px; padding:11px; }
+  .rebuild-box.show { display:block; }
+  .rebuild-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--green); margin-bottom:8px; }
+  .rebuild-prompt { font-family:'JetBrains Mono',monospace; font-size:11px; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:9px; color:var(--text); line-height:1.6; word-break:break-word; margin-bottom:8px; }
+  .copy-btn { width:100%; padding:7px; border-radius:7px; background:var(--green); border:none; color:white; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:filter .15s; }
+  .copy-btn:hover { filter:brightness(1.08); }
+
+  /* GRID VIEW */
+  .grid-view .artifact-card .card-main { flex-direction:column; align-items:flex-start; padding:13px; }
+  .grid-view .card-right { width:100%; justify-content:flex-end; margin-top:8px; }
+  .grid-view .version-drawer { display:none !important; }
+
+  /* DETAIL PANEL */
+  .detail-panel { width:272px; flex-shrink:0; background:var(--surface); border-left:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden; }
+  .detail-scroll { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:18px; }
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .stat-box { background:var(--bg); border-radius:8px; padding:10px; text-align:center; border:1px solid var(--border); }
+  .stat-num { font-size:21px; font-weight:700; }
+  .stat-label { font-size:10px; color:var(--muted); margin-top:2px; }
+  .detail-row { display:flex; flex-direction:column; gap:3px; margin-bottom:10px; }
+  .detail-label { font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:var(--subtle); font-weight:600; }
+  .detail-value { font-size:12.5px; color:var(--text); }
+  .detail-value.mono { font-family:'JetBrains Mono',monospace; font-size:11.5px; }
+  .activity-item { display:flex; align-items:flex-start; gap:8px; margin-bottom:7px; font-size:11.5px; color:var(--muted); }
+  .activity-dot { width:6px; height:6px; border-radius:50%; margin-top:4px; flex-shrink:0; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(70px); background:var(--text); color:var(--surface); border-radius:10px; padding:9px 18px; font-size:13px; display:flex; align-items:center; gap:8px; transition:transform .25s cubic-bezier(.34,1.56,.64,1); z-index:999; white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,.14); pointer-events:none; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:4px; } ::-webkit-scrollbar-track { background:transparent; } ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+  /* EMPTY STATE */
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; height:200px; color:var(--muted); font-size:13.5px; gap:8px; }
+  .empty-icon { font-size:32px; opacity:.3; }
+
+  /* FOLDER TREE */
+  .folder-tree-item { position:relative; }
+  .folder-row { display:flex; align-items:center; padding:5px 10px; border-radius:7px; cursor:pointer; font-size:13px; color:var(--muted); transition:all .12s; user-select:none; gap:4px; margin-bottom:1px; }
+  .folder-row:hover { background:var(--surface2); color:var(--text); }
+  .folder-row:hover .folder-actions { opacity:1; }
+  .folder-row.active { background:var(--accent-bg); color:var(--accent); font-weight:500; }
+  .folder-row.active .f-count { background:rgba(217,119,87,.12); color:var(--accent); }
+  .f-toggle { width:14px; font-size:8px; flex-shrink:0; color:var(--subtle); transition:transform .15s; cursor:pointer; text-align:center; }
+  .f-toggle.open { transform:rotate(90deg); }
+  .f-toggle.leaf { opacity:0; pointer-events:none; }
+  .f-icon { font-size:13px; flex-shrink:0; }
+  .f-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .f-count { font-size:10px; background:var(--surface2); color:var(--muted); padding:1px 5px; border-radius:8px; flex-shrink:0; }
+  .folder-actions { opacity:0; display:flex; gap:2px; flex-shrink:0; transition:opacity .12s; }
+  .f-act { background:none; border:none; cursor:pointer; font-size:11px; color:var(--subtle); padding:2px 3px; border-radius:4px; line-height:1; }
+  .f-act:hover { background:var(--surface3); color:var(--text); }
+  .folder-children { padding-left:14px; border-left:1px solid var(--border); margin-left:15px; }
+  .add-root-folder { display:flex; align-items:center; gap:6px; padding:5px 10px; border-radius:7px; cursor:pointer; font-size:12px; color:var(--subtle); transition:all .12s; margin-top:4px; border:1px dashed transparent; }
+  .add-root-folder:hover { border-color:var(--border2); color:var(--accent); }
+
+  /* DRAG */
+  .artifact-card[draggable=true] { cursor:grab; }
+  .artifact-card.dragging { opacity:.3; border-style:dashed; }
+  .drag-handle { color:var(--border2); font-size:12px; padding:0 3px; cursor:grab; flex-shrink:0; opacity:0; transition:opacity .12s; }
+  .artifact-card:hover .drag-handle { opacity:1; }
+  .folder-row.drop-target { background:var(--accent-bg) !important; border:1px solid var(--accent-brd) !important; color:var(--accent) !important; }
+  .folder-row.drop-forbidden { background:rgba(197,68,68,.06) !important; border:1px solid rgba(197,68,68,.2) !important; }
+
+  /* MODALS */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.2); backdrop-filter:blur(3px); z-index:200; display:none; align-items:center; justify-content:center; }
+  .modal-overlay.show { display:flex; }
+  .modal { background:var(--surface); border:1px solid var(--border2); border-radius:14px; padding:22px; width:360px; display:flex; flex-direction:column; gap:14px; box-shadow:0 20px 50px rgba(0,0,0,.10); }
+  .modal-title { font-size:15px; font-weight:700; }
+  .modal-field { display:flex; flex-direction:column; gap:5px; }
+  .modal-label { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--subtle); }
+  .modal-input { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:8px 11px; color:var(--text); font-family:inherit; font-size:13.5px; outline:none; transition:border-color .15s,box-shadow .15s; }
+  .modal-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg); }
+  .modal-emoji-grid { display:flex; flex-wrap:wrap; gap:3px; }
+  .modal-emoji { font-size:19px; padding:4px; border-radius:6px; cursor:pointer; border:2px solid transparent; transition:all .12s; background:none; }
+  .modal-emoji:hover { background:var(--surface2); }
+  .modal-emoji.sel { border-color:var(--accent); background:var(--accent-bg); }
+  .modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
+  .modal-btn { padding:8px 16px; border-radius:8px; border:none; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; transition:all .12s; }
+  .modal-btn-primary { background:var(--accent); color:white; }
+  .modal-btn-primary:hover { background:var(--accent-dk); }
+  .modal-btn-cancel { background:var(--surface2); color:var(--muted); }
+  .modal-btn-cancel:hover { background:var(--surface3); color:var(--text); }
+  .modal-btn-danger { background:rgba(197,68,68,.08); color:var(--red); border:1px solid rgba(197,68,68,.2); }
+  .modal-btn-danger:hover { background:rgba(197,68,68,.14); }
+  .tswitch { width:38px; height:21px; background:var(--border2); border-radius:11px; position:relative; transition:background .2s; flex-shrink:0; cursor:pointer; }
+  .tswitch::after { content:''; position:absolute; width:15px; height:15px; background:white; border-radius:50%; top:3px; left:3px; transition:transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.18); }
+  .tswitch.on { background:var(--accent); }
+  .tswitch.on::after { transform:translateX(17px); }
+
+  /* CONTEXT MENU */
+  .ctx-menu { position:fixed; background:var(--surface); border:1px solid var(--border2); border-radius:10px; padding:4px; z-index:500; min-width:166px; box-shadow:0 8px 24px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06); display:none; }
+  .ctx-menu.show { display:block; }
+  .ctx-item { padding:7px 11px; border-radius:6px; font-size:12.5px; cursor:pointer; color:var(--muted); transition:all .1s; display:flex; align-items:center; gap:8px; }
+  .ctx-item:hover { background:var(--surface2); color:var(--text); }
+  .ctx-item.danger { color:var(--red); }
+  .ctx-item.danger:hover { background:rgba(197,68,68,.06); }
+  /* GITHUB SYNC */
+  .gh-status { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; white-space:nowrap; }
+  .gh-dot { width:7px; height:7px; border-radius:50%; background:var(--border2); flex-shrink:0; }
+  .gh-dot.connected { background:var(--green); }
+  .gh-dot.syncing { background:var(--accent); animation:pulse .8s infinite alternate; }
+  .gh-dot.error { background:var(--red); }
+  @keyframes pulse { from{opacity:.4} to{opacity:1} }
+  .btn-gh-push { background:var(--green-bg); color:var(--green); border:1px solid var(--green-brd); }
+  .btn-gh-push:hover { background:rgba(74,152,104,.14); }
+  .btn-gh-pull { background:rgba(60,121,216,.08); color:var(--blue); border:1px solid rgba(60,121,216,.22); }
+  .btn-gh-pull:hover { background:rgba(60,121,216,.13); }
+  .btn-gear { background:transparent; border:1px solid var(--border); color:var(--muted); padding:6px 9px; font-size:14px; }
+  .btn-gear:hover { color:var(--text); border-color:var(--border2); background:var(--surface2); }
+  .modal-wide { width:420px; }
+  .modal-hint { font-size:11px; color:var(--subtle); line-height:1.5; }
+  .modal-input-mono { font-family:'JetBrains Mono',monospace; font-size:12px; }
+  .gh-status-panel { display:flex; align-items:center; gap:8px; padding:9px 12px; background:var(--bg); border:1px solid var(--border); border-radius:8px; font-size:12px; color:var(--muted); }
+  .gh-time-row { display:flex; justify-content:space-between; font-size:11px; color:var(--subtle); margin-top:4px; }
+  .ctx-divider { height:1px; background:var(--border); margin:3px 0; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-icon">⬡</div>
+    Artifact Manager
+    <span class="owner-badge" id="ownerBadge">Personal</span>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="searchInput" placeholder="Search artifacts, tags, descriptions…" oninput="doSearch()">
+    </div>
+    <button class="btn btn-primary" id="newArtifactBtn" onclick="document.getElementById('newArtifactFile').click()" style="display:none;white-space:nowrap">+ New</button>
+    <input type="file" id="newArtifactFile" style="display:none" onchange="onNewArtifactFile(this)">
+  </div>
+  <div class="topbar-right">
+    <div class="gh-status" id="ghStatus">
+      <span class="gh-dot" id="ghDot"></span>
+      <span id="ghStatusText">Not configured</span>
+    </div>
+    <button class="btn btn-gh-push" id="ghPushBtn" onclick="ghPush()" title="Push catalogue to GitHub" style="display:none">⬆ Push</button>
+    <button class="btn btn-gh-pull" id="ghPullBtn" onclick="ghPull()" title="Pull catalogue from GitHub" style="display:none">⬇ Pull</button>
+    <button class="btn btn-ghost" onclick="exportDelta()" title="Export delta JSON (local backup)">⬇ Delta</button>
+    <button class="btn btn-ghost btn-gear" onclick="openSettingsModal()" title="Settings">⚙</button>
+    <input type="file" id="fileInput" accept=".json" style="display:none" onchange="loadFile(this)">
+    <div class="avatar" title="Phillip Richards">PR</div>
+  </div>
+</div>
+
+<div class="workspace" id="workspace">
+
+  <!-- LOAD SCREEN (shown until JSON loaded) -->
+  <div class="load-screen" id="loadScreen">
+    <div class="load-box">
+      <div class="load-icon">⬡</div>
+      <div class="load-title">Load your catalogue</div>
+      <div class="load-desc">Drop your <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:12px">historic-artifacts.json</code> to populate your personal Artifact Manager with your real projects and versions.</div>
+      <button class="load-btn" onclick="document.getElementById('fileInput').click()">📂 Choose JSON file…</button>
+      <div class="load-hint">Or drag and drop the file anywhere on this page</div>
+    </div>
+  </div>
+
+  <!-- MAIN INTERFACE (hidden until JSON loaded) -->
+  <div id="mainInterface" style="display:none;flex:1;display:none;overflow:hidden;flex-direction:row" class="workspace-inner">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-scroll">
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">Views</div>
+          <div class="nav-item active" id="nav-all" onclick="selectView('all',this)">⊞ All Artifacts <span class="nav-count" id="count-all">0</span></div>
+          <div class="starred-nav" id="nav-starred" onclick="selectView('starred',this)">★ Favourites <span style="margin-left:auto;font-size:11px" id="count-starred">0</span></div>
+          <div class="nav-item" id="nav-recent" onclick="selectView('recent',this)">🕐 Recent <span class="nav-count" id="count-recent">0</span></div>
+          <div class="nav-item" id="nav-dupes" onclick="selectView('dupes',this)" style="color:var(--red)">⚠ Duplicates <span class="nav-count" id="count-dupes" style="background:rgba(197,68,68,.08);color:var(--red)">0</span></div>
+          <div class="nav-item" id="nav-unassigned" onclick="selectView('unassigned',this)" style="display:none;color:var(--amber)">📂 Unassigned <span class="nav-count" id="count-unassigned" style="background:rgba(180,140,40,.1);color:var(--amber)">0</span></div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-label">Folders</div>
+          <div id="folderNav"></div>
+        </div>
+
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="detail-section-title">Catalogue</div>
+        <div class="storage-label" id="storageLabel">— artifacts · — versions</div>
+        <div class="storage-bar-bg"><div class="storage-bar-fill" id="storageBar" style="width:0%"></div></div>
+        <div class="storage-label" id="storageDate">Personal workspace</div>
+        <button class="load-new-btn" style="margin-top:6px" onclick="document.getElementById('fileInput').click()">⤴ Merge / load JSON</button>
+        <button class="load-new-btn" style="margin-top:4px" onclick="exportFull()">⬇ Full export</button>
+        <button class="load-new-btn" style="margin-top:4px;color:var(--red);border-color:rgba(248,81,73,.3)" onclick="clearStorage()">🗑 Clear local storage</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+      <div class="main-header">
+        <div class="main-header-top">
+          <div>
+            <div class="main-title" id="viewTitle">All Artifacts</div>
+            <div class="main-subtitle" id="viewSub">Loading…</div>
+          </div>
+          <div class="header-actions">
+            <div class="view-toggle">
+              <button class="view-btn active" id="listViewBtn" onclick="setView('list')">☰</button>
+              <button class="view-btn" id="gridViewBtn" onclick="setView('grid')">⊞</button>
+            </div>
+            <select class="sort-select" onchange="doSort(this.value)">
+              <option value="recent">Sort: Most Recent</option>
+              <option value="name">Sort: Name A–Z</option>
+              <option value="versions">Sort: Most Versions</option>
+              <option value="starred">Sort: Starred First</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-row">
+          <button class="pill active" onclick="filterType('all',this)">All</button>
+          <button class="pill" onclick="filterType('html',this)">🌐 HTML</button>
+          <button class="pill" onclick="filterType('py',this)">🐍 Python</button>
+          <button class="pill" onclick="filterType('xlsx',this)">📊 Excel</button>
+          <button class="pill" onclick="filterType('docx',this)">📝 Word</button>
+          <button class="pill" onclick="filterType('jsx',this)">⚛ React</button>
+          <button class="pill" onclick="filterType('ts',this)">📘 TS</button>
+          <button class="pill" onclick="filterType('js',this)">📜 JS</button>
+          <button class="pill" onclick="filterType('vue',this)">💚 Vue</button>
+          <button class="pill" onclick="filterType('md',this)">📋 MD</button>
+          <button class="pill" onclick="filterType('json',this)">{ } JSON</button>
+          <button class="pill" onclick="filterType('csv',this)">📈 CSV</button>
+          <button class="pill" onclick="filterType('sql',this)">🗄 SQL</button>
+          <button class="pill" onclick="filterType('css',this)">🎨 CSS</button>
+          <button class="pill" onclick="filterType('svg',this)">🖼 SVG</button>
+          <button class="pill" onclick="filterType('pdf',this)">📕 PDF</button>
+          <button class="pill" onclick="filterType('pptx',this)">📑 PPT</button>
+          <button class="pill" onclick="filterType('sh',this)">⌨ Shell</button>
+          <button class="pill" onclick="filterType('yaml',this)">⚙ YAML</button>
+          <button class="pill" onclick="filterType('zip',this)">📦 Zip</button>
+          <button class="pill" onclick="filterType('other',this)">📄 Other</button>
+        </div>
+      </div>
+
+      <div class="artifact-list" id="artifactList"></div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="detail-panel">
+      <div class="detail-scroll">
+
+        <div>
+          <div class="detail-section-title">Workspace Overview</div>
+          <div class="stat-grid" id="statsGrid">
+            <div class="stat-box"><div class="stat-num" id="stat-artifacts">—</div><div class="stat-label">Artifacts</div></div>
+            <div class="stat-box"><div class="stat-num" id="stat-versions">—</div><div class="stat-label">Versions</div></div>
+            <div class="stat-box"><div class="stat-num" style="color:var(--amber)" id="stat-starred">—</div><div class="stat-label">Favourites</div></div>
+            <div class="stat-box"><div class="stat-num" style="color:var(--green)" id="stat-folders">—</div><div class="stat-label">Folders</div></div>
+          </div>
+        </div>
+
+        <div id="selectedDetail">
+          <div class="detail-section-title">Selected Artifact</div>
+          <div style="font-size:12px;color:var(--muted);font-style:italic">Click an artifact card to inspect it</div>
+        </div>
+
+        <div>
+          <div class="detail-section-title">Recent Activity</div>
+          <div id="activityFeed">
+            <div style="font-size:12px;color:var(--muted);font-style:italic">Load your JSON to see activity</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- workspace-inner -->
+
+</div><!-- workspace -->
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal modal-wide">
+    <div class="modal-title">⚙ Settings</div>
+
+    <div class="detail-section-title" style="margin-bottom:6px">GitHub Sync</div>
+    <div id="ghStatusPanel" class="gh-status-panel">
+      <span class="gh-dot" id="ghDotModal"></span>
+      <span id="ghStatusPanelText">Not configured</span>
+    </div>
+    <div class="gh-time-row" id="ghTimesRow" style="display:none">
+      <span id="ghLastPushLabel">—</span>
+      <span id="ghLastPullLabel">—</span>
+    </div>
+
+    <div class="modal-field">
+      <label class="modal-label">GitHub Username</label>
+      <input class="modal-input modal-input-mono" id="gh-owner" placeholder="philliprichards26">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Repository Name</label>
+      <input class="modal-input modal-input-mono" id="gh-repo" placeholder="artyfarty">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">File path in repo</label>
+      <input class="modal-input modal-input-mono" id="gh-path" placeholder="artifacts.json">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Personal Access Token (PAT)</label>
+      <input class="modal-input modal-input-mono" id="gh-pat" type="password" placeholder="github_pat_...">
+      <span class="modal-hint">Stored in localStorage only — never sent anywhere except the GitHub API directly.</span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-danger" onclick="clearGhSettings()" style="margin-right:auto">Disconnect</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeSettingsModal()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveGhSettings()">Save &amp; Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOLDER MODAL -->
+<div class="modal-overlay" id="folderModal">
+  <div class="modal">
+    <div class="modal-title" id="folderModalTitle">New Folder</div>
+    <div class="modal-field">
+      <label class="modal-label">Icon</label>
+      <div class="modal-emoji-grid" id="folderEmojiGrid"></div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Name</label>
+      <input class="modal-input" id="folderNameInput" placeholder="e.g. My Project" onkeydown="if(event.key==='Enter')saveFolderModal()">
+    </div>
+    <input type="hidden" id="folderModalId">
+    <input type="hidden" id="folderModalParent">
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-danger" id="folderDeleteBtn" onclick="deleteFolderModal()" style="display:none;margin-right:auto">🗑 Delete</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeFolderModal()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveFolderModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTIFACT MODAL -->
+<div class="modal-overlay" id="artifactModal">
+  <div class="modal" style="width:480px;max-height:88vh;overflow-y:auto">
+    <div class="modal-title" id="artifactModalTitle">New Artifact</div>
+
+    <!-- Attached file indicator -->
+    <div id="am-file-banner" style="display:none;align-items:center;gap:10px;padding:10px 12px;background:rgba(63,185,80,.08);border:1px solid var(--green-dim);border-radius:8px">
+      <span style="font-size:18px">📎</span>
+      <div style="flex:1;min-width:0">
+        <div id="am-file-name" style="font-family:'JetBrains Mono',monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="am-file-size" style="font-size:11px;color:var(--muted);margin-top:2px"></div>
+      </div>
+      <button class="modal-btn modal-btn-cancel" style="padding:4px 10px;font-size:11px" onclick="document.getElementById('newArtifactFile').click()">Replace</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="modal-field" style="grid-column:1/-1">
+        <label class="modal-label">Name *</label>
+        <input class="modal-input" id="am-name" placeholder="e.g. dashboard.html">
+      </div>
+      <div class="modal-field" style="grid-column:1/-1">
+        <label class="modal-label">Description</label>
+        <input class="modal-input" id="am-desc" placeholder="What does it do?">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Folder</label>
+        <select class="modal-input" id="am-folder" style="cursor:pointer"></select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Tags <span style="font-weight:400;text-transform:none;letter-spacing:0">(comma separated)</span></label>
+        <input class="modal-input" id="am-tags" placeholder="e.g. mobile, react">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Version</label>
+        <input class="modal-input" id="am-ver" placeholder="v1">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Version Note</label>
+        <input class="modal-input" id="am-note" placeholder="e.g. initial build">
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="toggleAMPref()">
+      <span style="font-size:13px;flex:1">★ Mark as preferred version</span>
+      <div class="tswitch-dark" id="am-pref-switch"></div>
+    </div>
+
+    <input type="hidden" id="am-edit-id">
+    <input type="hidden" id="am-file-content">
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-danger" id="am-delete-btn" onclick="deleteArtifactModal()" style="display:none;margin-right:auto">🗑 Delete</button>
+      <button class="modal-btn modal-btn-cancel" onclick="closeArtifactModal()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveArtifactModal()">Save Artifact</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-item" onclick="ctxAction('open')">↗ Open in Claude</div>
+  <div class="ctx-item" onclick="ctxAction('edit')">✏ Edit artifact</div>
+  <div class="ctx-item" onclick="ctxAction('copy')">⧉ Duplicate artifact</div>
+  <div class="ctx-item" onclick="ctxAction('move')">📁 Move to folder…</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" onclick="ctxAction('export')">⬇ Export JSON</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item danger" onclick="ctxAction('delete')">🗑 Delete artifact</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STORAGE KEYS ──────────────────────────────────────────────────────────
+const LS_ARTIFACTS = 'cam_artifacts';
+const LS_FOLDERS   = 'cam_folders';
+const LS_EXPORTED  = 'cam_last_exported'; // timestamp of last export
+const LS_GH_OWNER  = 'cam_gh_owner';
+const LS_GH_REPO   = 'cam_gh_repo';
+const LS_GH_PATH   = 'cam_gh_path';
+const LS_GH_PAT    = 'cam_gh_pat';
+const LS_GH_SHA    = 'cam_gh_sha';
+const LS_GH_PUSHED = 'cam_gh_last_push';
+const LS_GH_PULLED = 'cam_gh_last_pull';
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let ARTIFACTS = [];
+let FOLDERS = [];
+let currentView = 'all';
+let currentFolderId = null;
+let currentType = 'all';
+let searchTerm = '';
+let sortBy = 'recent';
+let viewMode = 'list';
+let expandedId = null;
+
+// ── LOCALSTORAGE HELPERS ──────────────────────────────────────────────────
+function lsSave() {
+  try {
+    localStorage.setItem(LS_ARTIFACTS, JSON.stringify(ARTIFACTS));
+    localStorage.setItem(LS_FOLDERS,   JSON.stringify(FOLDERS));
+  } catch(e) { console.warn('localStorage save failed', e); }
+}
+
+function lsLoad() {
+  try {
+    const arts  = localStorage.getItem(LS_ARTIFACTS);
+    const folds = localStorage.getItem(LS_FOLDERS);
+    if (arts && folds) {
+      ARTIFACTS = JSON.parse(arts);
+      FOLDERS   = JSON.parse(folds);
+      return true;
+    }
+  } catch(e) { console.warn('localStorage load failed', e); }
+  return false;
+}
+
+// ── STARTUP — try localStorage first ─────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem(LS_GH_OWNER)) localStorage.setItem(LS_GH_OWNER, 'philliprichards26');
+  if (!localStorage.getItem(LS_GH_REPO))  localStorage.setItem(LS_GH_REPO,  'artyfarty');
+  if (!localStorage.getItem(LS_GH_PATH))  localStorage.setItem(LS_GH_PATH,  'artifacts.json');
+  updateGhStatusUI();
+  if (lsLoad() && ARTIFACTS.length > 0) {
+    showInterface();
+    showToast('Restored ' + ARTIFACTS.length + ' artifacts from local storage');
+    setTimeout(function() { ghAutoPullOnLoad(); }, 800);
+  }
+  // else load screen stays visible, waiting for JSON drop
+});
+
+// ── FILE LOADING ──────────────────────────────────────────────────────────
+function loadFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // If we already have data, treat as merge; otherwise fresh load
+      if (ARTIFACTS.length > 0) {
+        mergeData(data);
+      } else {
+        initData(data);
+      }
+    } catch(err) {
+      showToast('⚠ Invalid JSON file — could not parse');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// Drag & drop
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (!file || !file.name.endsWith('.json')) { showToast('⚠ Please drop a .json file'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (ARTIFACTS.length > 0) {
+        mergeData(data);
+      } else {
+        initData(data);
+      }
+    } catch(err) {
+      showToast('⚠ Invalid JSON file — could not parse');
+    }
+  };
+  reader.readAsText(file);
+});
+
+// Fresh load — replaces everything, but never touches the export timestamp
+function initData(data) {
+  FOLDERS   = data.folders   || [];
+  ARTIFACTS = data.artifacts || [];
+  lsSave();
+  // Set baseline only if no export timestamp exists yet
+  if (!localStorage.getItem(LS_EXPORTED)) {
+    localStorage.setItem(LS_EXPORTED, new Date().toISOString());
+  }
+  showInterface();
+  showToast(`✦ Loaded ${ARTIFACTS.length} artifacts across ${FOLDERS.length} folders`);
+}
+
+// ── SMART MERGE IMPORT ────────────────────────────────────────────────────
+// Rules:
+//   - Match incoming artifacts by NAME (not id) — ids from different sessions collide
+//   - New artifact (name not in current) → assign a fresh id and add it
+//   - Existing artifact (same name) → merge new versions in (by v tag), never remove
+//   - starred / desc / tags on incoming win only if _updatedAt is newer
+//   - Deletions in the UI are NOT overwritten (absent from JSON ≠ deleted)
+//   - New folders added; existing folders untouched
+function mergeData(incoming) {
+  const inFolders   = incoming.folders   || [];
+  const inArtifacts = incoming.artifacts || [];
+
+  // Merge folders — add any new ones by id
+  let foldersAdded = 0;
+  inFolders.forEach(f => {
+    if (!FOLDERS.find(x => x.id === f.id)) {
+      FOLDERS.push(f);
+      foldersAdded++;
+    }
+  });
+
+  // Next safe id = max existing id + 1
+  function nextId() {
+    return ARTIFACTS.length > 0 ? Math.max(...ARTIFACTS.map(a => a.id)) + 1 : 1;
+  }
+
+  // Merge artifacts — match on name, not id
+  let added = 0, versionsAdded = 0, updated = 0;
+  inArtifacts.forEach(inc => {
+    const existing = ARTIFACTS.find(x => x.name === inc.name);
+    if (!existing) {
+      // Brand new — assign a fresh id to avoid collisions
+      const safeId = nextId();
+      ARTIFACTS.push({ ...inc, id: safeId });
+      added++;
+    } else {
+      // Merge versions: add any v tags not already present
+      const existingVTags = new Set(existing.versions.map(v => v.v));
+      (inc.versions || []).forEach(v => {
+        if (!existingVTags.has(v.v)) {
+          existing.versions.push(v);
+          versionsAdded++;
+        }
+      });
+      // Update metadata only if incoming is newer
+      const incUpdated  = inc._updatedAt  || inc.createdAt || 0;
+      const exUpdated   = existing._updatedAt || existing.createdAt || 0;
+      if (incUpdated > exUpdated) {
+        existing.desc    = inc.desc    ?? existing.desc;
+        existing.tags    = inc.tags    ?? existing.tags;
+        existing.starred = inc.starred ?? existing.starred;
+        existing._updatedAt = incUpdated;
+        updated++;
+      }
+    }
+  });
+
+  lsSave();
+  // Set baseline only if no export timestamp exists yet
+  if (!localStorage.getItem(LS_EXPORTED)) {
+    localStorage.setItem(LS_EXPORTED, new Date().toISOString());
+  }
+  buildSidebar();
+  updateStats();
+  buildActivity();
+  render();
+
+  const parts = [];
+  if (added)        parts.push(`${added} new artifact${added!==1?'s':''}`);
+  if (versionsAdded)parts.push(`${versionsAdded} new version${versionsAdded!==1?'s':''}`);
+  if (updated)      parts.push(`${updated} updated`);
+  if (foldersAdded) parts.push(`${foldersAdded} new folder${foldersAdded!==1?'s':''}`);
+  showToast(parts.length ? `✦ Merged: ${parts.join(' · ')}` : '✦ Nothing new to merge');
+}
+
+// ── SHOW INTERFACE ────────────────────────────────────────────────────────
+function showInterface() {
+  document.getElementById('loadScreen').style.display = 'none';
+  const mi = document.getElementById('mainInterface');
+  mi.style.display = 'flex';
+  mi.style.flex = '1';
+  mi.style.overflow = 'hidden';
+  document.getElementById('newArtifactBtn').style.display = 'block';
+  buildSidebar();
+  updateStats();
+  buildActivity();
+  selectView('all', document.getElementById('nav-all'));
+}
+
+// ── EXPORT — FULL ─────────────────────────────────────────────────────────
+function exportFull() {
+  const now = new Date().toISOString();
+  const data = {
+    exportedAt: now,
+    exportType: 'full',
+    folders:   FOLDERS,
+    artifacts: ARTIFACTS
+  };
+  downloadJSON(data, `artifacts-full-${now.slice(0,10)}.json`);
+  localStorage.setItem(LS_EXPORTED, now);
+  showToast(`⬇ Full export — ${ARTIFACTS.length} artifacts`);
+}
+
+// ── EXPORT — DELTA ────────────────────────────────────────────────────────
+// Only artifacts that changed since last export:
+// changed = createdAt after lastExport, OR any version.savedAt after lastExport,
+//           OR starred toggled (_updatedAt after lastExport), OR file attached
+function exportDelta() {
+  const lastExportRaw = localStorage.getItem(LS_EXPORTED);
+  if (!lastExportRaw) {
+    showToast('⚠ No previous export found — run Full Export first');
+    return;
+  }
+  const lastExport = new Date(lastExportRaw).getTime();
+  const now = new Date().toISOString();
+
+  const changed = ARTIFACTS.filter(a => {
+    if ((a.createdAt || 0) > lastExport) return true;
+    if ((a._updatedAt || 0) > lastExport) return true;
+    if (a._attachedFile) return true; // always include if file attached
+    return (a.versions || []).some(v => (v.savedAt || 0) > lastExport);
+  });
+
+  if (!changed.length) {
+    showToast('✦ No changes since last export — nothing to export');
+    return;
+  }
+
+  const data = {
+    exportedAt:    now,
+    exportType:    'delta',
+    deltaFrom:     lastExportRaw,
+    folders:       FOLDERS,
+    artifacts:     changed
+  };
+  downloadJSON(data, `artifacts-delta-${now.slice(0,10)}.json`);
+  localStorage.setItem(LS_EXPORTED, now);
+  showToast(`⬇ Delta export — ${changed.length} changed artifact${changed.length!==1?'s':''}`);
+}
+
+function downloadJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── TYPE DETECTION ────────────────────────────────────────────────────────
+function typeOf(name) {
+  const n = name.toLowerCase();
+  // Web & markup
+  if (n.endsWith('.html') || n.endsWith('.htm') || n.includes('/index.html')) return 'html';
+  if (n.endsWith('.css'))  return 'css';
+  if (n.endsWith('.svg'))  return 'svg';
+  if (n.endsWith('.xml'))  return 'xml';
+  // Scripts & languages
+  if (n.endsWith('.py'))   return 'py';
+  if (n.endsWith('.tsx'))  return 'tsx';
+  if (n.endsWith('.jsx') || n.endsWith('.react')) return 'jsx';
+  if (n.endsWith('.ts'))   return 'ts';
+  if (n.endsWith('.js') || n.endsWith('.mjs')) return 'js';
+  if (n.endsWith('.vue'))  return 'vue';
+  if (n.endsWith('.rb'))   return 'rb';
+  if (n.endsWith('.php'))  return 'php';
+  if (n.endsWith('.java')) return 'java';
+  if (n.endsWith('.rs'))   return 'rs';
+  if (n.endsWith('.go'))   return 'go';
+  if (n.endsWith('.sh') || n.endsWith('.bash') || n.endsWith('.zsh')) return 'sh';
+  // Data & config
+  if (n.endsWith('.sql'))  return 'sql';
+  if (n.endsWith('.json')) return 'json';
+  if (n.endsWith('.csv'))  return 'csv';
+  if (n.endsWith('.yaml') || n.endsWith('.yml')) return 'yaml';
+  if (n.endsWith('.toml')) return 'toml';
+  // Documents
+  if (n.endsWith('.md') || n.endsWith('.mdx')) return 'md';
+  if (n.endsWith('.txt'))  return 'txt';
+  if (n.endsWith('.docx') || n.endsWith('.doc')) return 'docx';
+  if (n.endsWith('.xlsx') || n.endsWith('.xls')) return 'xlsx';
+  if (n.endsWith('.pptx') || n.endsWith('.ppt')) return 'pptx';
+  if (n.endsWith('.pdf'))  return 'pdf';
+  // Archives & media
+  if (n.endsWith('.zip') || n.endsWith('.tar') || n.endsWith('.gz')) return 'zip';
+  if (n.endsWith('.mp4') || n.endsWith('.mov') || n.endsWith('.avi')) return 'mp4';
+  if (n.endsWith('.mp3') || n.endsWith('.wav') || n.endsWith('.ogg')) return 'mp3';
+  return 'other';
+}
+
+const TYPE_EMOJI = {
+  // Web & markup
+  html:'🌐', css:'🎨', svg:'🖼', xml:'📐',
+  // Scripts & languages
+  py:'🐍', jsx:'⚛', tsx:'⚛', ts:'📘', js:'📜', vue:'💚',
+  rb:'💎', php:'🐘', java:'☕', rs:'🦀', go:'🐹', sh:'⌨',
+  // Data & config
+  sql:'🗄', json:'{}', csv:'📈', yaml:'⚙', toml:'⚙',
+  // Documents
+  md:'📋', txt:'📄', docx:'📝', xlsx:'📊', pptx:'📑', pdf:'📕',
+  // Archives & media
+  zip:'📦', mp4:'🎬', mp3:'🎵',
+  // Fallback
+  other:'📄'
+};
+function emojiOf(t) { return TYPE_EMOJI[t] || '📄'; }
+
+// ── FOLDER TREE ───────────────────────────────────────────────────────────
+// Each folder: { id, name, icon, parentId? }
+// collapsed state tracked separately so it survives re-renders
+const collapsedFolders = new Set();
+
+// Count artifacts in a folder AND all its descendants
+function countInFolder(folderId) {
+  const children = FOLDERS.filter(f => f.parentId === folderId);
+  const direct = ARTIFACTS.filter(a => a.folder === folderId).length;
+  return direct + children.reduce((s, c) => s + countInFolder(c.id), 0);
+}
+
+// Render a folder node recursively; returns HTML string
+function renderFolderNode(folder, depth) {
+  const children = FOLDERS.filter(f => f.parentId === folder.id);
+  const hasChildren = children.length > 0;
+  const isOpen = !collapsedFolders.has(folder.id);
+  const count = countInFolder(folder.id);
+  const isActive = currentView === 'folder' && currentFolderId === folder.id;
+
+  const toggleClass = hasChildren ? (isOpen ? 'open' : '') : 'leaf';
+
+  const childrenHtml = hasChildren && isOpen
+    ? `<div class="folder-children">${children.map(c => renderFolderNode(c, depth + 1)).join('')}</div>`
+    : '';
+
+  return `
+    <div class="folder-tree-item">
+      <div class="folder-row${isActive ? ' active' : ''}" id="fnav-${folder.id}"
+           onclick="selectFolder(${folder.id}, this)"
+           ondragover="onFolderDragOver(event,${folder.id})"
+           ondragleave="onFolderDragLeave(event)"
+           ondrop="onFolderDrop(event,${folder.id})"
+           ondragstart="onFolderDragStart(event,${folder.id})"
+           draggable="true"
+           >
+        <span class="f-toggle ${toggleClass}"
+              onclick="event.stopPropagation(); toggleFolderCollapse(${folder.id})">▶</span>
+        <span class="f-icon">${folder.icon || '📁'}</span>
+        <span class="f-name">${folder.name}</span>
+        <span class="f-count">${count}</span>
+        <span class="folder-actions">
+          <button class="f-act" title="Add subfolder"
+                  onmousedown="event.stopPropagation()"
+                  onclick="event.stopPropagation(); openFolderModal(null, ${folder.id})">+</button>
+          <button class="f-act" title="Rename / edit"
+                  onmousedown="event.stopPropagation()"
+                  onclick="event.stopPropagation(); openFolderModal(${folder.id})">✏</button>
+        </span>
+      </div>
+      ${childrenHtml}
+    </div>`;
+}
+
+function buildSidebar() {
+  // Root folders = no parentId or parentId is null/undefined
+  const roots = FOLDERS.filter(f => !f.parentId);
+  const container = document.getElementById('folderNav');
+  container.innerHTML =
+    roots.map(f => renderFolderNode(f, 0)).join('') +
+    `<div class="add-root-folder" onclick="openFolderModal(null, null)">＋ New folder</div>`;
+
+  document.getElementById('count-all').textContent = ARTIFACTS.length;
+  document.getElementById('count-starred').textContent = ARTIFACTS.filter(a => a.starred).length;
+  document.getElementById('count-recent').textContent = Math.min(ARTIFACTS.length, 8);
+  // Duplicates count = number of artifacts whose name appears more than once
+  const nameCounts = {};
+  ARTIFACTS.forEach(a => { nameCounts[a.name] = (nameCounts[a.name] || 0) + 1; });
+  const dupeCount = ARTIFACTS.filter(a => nameCounts[a.name] > 1).length;
+  const dupesEl = document.getElementById('count-dupes');
+  if (dupesEl) dupesEl.textContent = dupeCount;
+  const dupesNav = document.getElementById('nav-dupes');
+  if (dupesNav) dupesNav.style.display = dupeCount > 0 ? 'flex' : 'none';
+  const unassignedCount = ARTIFACTS.filter(a => a.folder === null || a.folder === undefined).length;
+  const unassignedEl = document.getElementById('count-unassigned');
+  if (unassignedEl) unassignedEl.textContent = unassignedCount;
+  const unassignedNav = document.getElementById('nav-unassigned');
+  if (unassignedNav) unassignedNav.style.display = unassignedCount > 0 ? 'flex' : 'none';
+}
+
+function toggleFolderCollapse(id) {
+  if (collapsedFolders.has(id)) collapsedFolders.delete(id);
+  else collapsedFolders.add(id);
+  buildSidebar();
+}
+
+// ── FOLDER MODAL ──────────────────────────────────────────────────────────
+const FOLDER_EMOJIS = ['📁','📂','💼','🚚','🍫','📊','⚖️','📷','⬡','🔧','🎨','📝','🌐','🐍','⚙️','🔬','🎯','💡','🚀','💰','🏗️','📱','📋','🗂️','🗃️','📌','🔑','🧩','⭐','🏷️'];
+let _folderSelIcon = '📁';
+
+function openFolderModal(editId = null, parentId = null) {
+  _folderSelIcon = '📁';
+  const isEdit = editId !== null;
+  const folder = isEdit ? FOLDERS.find(f => f.id === editId) : null;
+
+  document.getElementById('folderModalTitle').textContent = isEdit ? 'Edit Folder' : 'New Folder';
+  document.getElementById('folderModalId').value = editId ?? '';
+  document.getElementById('folderModalParent').value = parentId ?? '';
+  document.getElementById('folderNameInput').value = isEdit ? folder.name : '';
+  document.getElementById('folderDeleteBtn').style.display = isEdit ? 'block' : 'none';
+
+  if (isEdit && folder) _folderSelIcon = folder.icon || '📁';
+
+  // Build emoji grid
+  document.getElementById('folderEmojiGrid').innerHTML = FOLDER_EMOJIS.map(e =>
+    `<button class="modal-emoji${e === _folderSelIcon ? ' sel' : ''}"
+             onclick="selectFolderEmoji('${e}', this)">${e}</button>`
+  ).join('');
+
+  document.getElementById('folderModal').classList.add('show');
+  setTimeout(() => document.getElementById('folderNameInput').focus(), 50);
+}
+
+function selectFolderEmoji(emoji, btn) {
+  _folderSelIcon = emoji;
+  document.querySelectorAll('.modal-emoji').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function closeFolderModal() {
+  document.getElementById('folderModal').classList.remove('show');
+}
+
+function saveFolderModal() {
+  const name = document.getElementById('folderNameInput').value.trim();
+  if (!name) { showToast('⚠ Folder name required'); return; }
+  const editId = document.getElementById('folderModalId').value;
+  const parentRaw = document.getElementById('folderModalParent').value;
+  const parentId = parentRaw !== '' ? parseInt(parentRaw) : null;
+
+  if (editId) {
+    // Rename/edit existing
+    const f = FOLDERS.find(x => x.id === parseInt(editId));
+    if (f) { f.name = name; f.icon = _folderSelIcon; }
+    showToast(`✦ "${name}" updated`);
+  } else {
+    // Create new
+    const newId = Math.max(0, ...FOLDERS.map(f => f.id)) + 1;
+    FOLDERS.push({ id: newId, name, icon: _folderSelIcon, parentId });
+    showToast(`✦ "${name}" created`);
+  }
+
+  lsSave();
+  closeFolderModal();
+  buildSidebar();
+  updateStats();
+}
+
+function deleteFolderModal() {
+  const editId = parseInt(document.getElementById('folderModalId').value);
+  const folder = FOLDERS.find(f => f.id === editId);
+  if (!folder) return;
+
+  // Check for artifacts or child folders
+  const hasArtifacts = ARTIFACTS.some(a => a.folder === editId);
+  const hasChildren = FOLDERS.some(f => f.parentId === editId);
+  if (hasArtifacts || hasChildren) {
+    showToast('⚠ Move artifacts and subfolders out first');
+    return;
+  }
+
+  if (!confirm(`Delete "${folder.name}"? This cannot be undone.`)) return;
+  FOLDERS = FOLDERS.filter(f => f.id !== editId);
+  lsSave();
+  closeFolderModal();
+  if (currentFolderId === editId) selectView('all', document.getElementById('nav-all'));
+  else buildSidebar();
+  showToast(`🗑 "${folder.name}" deleted`);
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────
+function updateStats() {
+  const totalVersions = ARTIFACTS.reduce((s,a)=>s+a.versions.length,0);
+  const starred = ARTIFACTS.filter(a=>a.starred).length;
+  document.getElementById('stat-artifacts').textContent = ARTIFACTS.length;
+  document.getElementById('stat-versions').textContent = totalVersions;
+  document.getElementById('stat-starred').textContent = starred;
+  document.getElementById('stat-folders').textContent = FOLDERS.length;
+  document.getElementById('storageLabel').textContent = `${ARTIFACTS.length} artifacts · ${totalVersions} versions`;
+  const pct = Math.min(100, Math.round((totalVersions / 200) * 100));
+  document.getElementById('storageBar').style.width = pct + '%';
+  const lastExp = localStorage.getItem(LS_EXPORTED);
+  document.getElementById('storageDate').textContent = lastExp
+    ? `Last export: ${new Date(lastExp).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'})}`
+    : 'Not yet exported';
+}
+
+function clearStorage() {
+  if (!confirm('Clear all locally stored data? You will need to reload your JSON.')) return;
+  localStorage.removeItem(LS_ARTIFACTS);
+  localStorage.removeItem(LS_FOLDERS);
+  localStorage.removeItem(LS_EXPORTED);
+  ARTIFACTS = []; FOLDERS = [];
+  document.getElementById('mainInterface').style.display = 'none';
+  document.getElementById('loadScreen').style.display = 'flex';
+  showToast('✦ Local storage cleared');
+}
+
+// ── ACTIVITY FEED ─────────────────────────────────────────────────────────
+function buildActivity() {
+  const feed = document.getElementById('activityFeed');
+  const colors = ['var(--green)','var(--amber)','var(--blue)','var(--purple)','var(--cyan)','var(--red)'];
+  // Most recently created artifacts
+  const recent = ARTIFACTS.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,8);
+  feed.innerHTML = recent.map((a,i) => {
+    const preferred = a.versions.find(v=>v.preferred);
+    const label = preferred ? `preferred: "${preferred.note}"` : `${a.versions.length} version${a.versions.length!==1?'s':''}`;
+    const folder = FOLDERS.find(f=>f.id===a.folder);
+    return `<div class="activity-item"><div class="activity-dot" style="background:${colors[i%colors.length]}"></div>${a.name} — ${label}${folder?' · '+folder.icon:''}</div>`;
+  }).join('');
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function getFiltered() {
+  let list = [...ARTIFACTS];
+
+  // View filter
+  if (currentView === 'starred') list = list.filter(a=>a.starred);
+  else if (currentView === 'recent') list = list.slice().sort((a,b)=>b.createdAt-a.createdAt).slice(0,8);
+  else if (currentView === 'unassigned') list = list.filter(a => a.folder === null || a.folder === undefined);
+  else if (currentView === 'folder' && currentFolderId !== null) list = list.filter(a=>a.folder===currentFolderId);
+  else if (currentView === 'dupes') {
+    const nameCounts = {};
+    ARTIFACTS.forEach(a => { nameCounts[a.name] = (nameCounts[a.name] || 0) + 1; });
+    list = list.filter(a => nameCounts[a.name] > 1);
+    // Sort by name so duplicates are grouped together
+    list.sort((a,b) => a.name.localeCompare(b.name));
+  }
+
+  // Type filter
+  if (currentType !== 'all') list = list.filter(a=>typeOf(a.name)===currentType);
+
+  // Search
+  if (searchTerm) {
+    const s = searchTerm.toLowerCase();
+    list = list.filter(a =>
+      a.name.toLowerCase().includes(s) ||
+      (a.desc||'').toLowerCase().includes(s) ||
+      (a.tags||[]).some(t=>t.toLowerCase().includes(s)) ||
+      a.versions.some(v=>(v.note||'').toLowerCase().includes(s))
+    );
+  }
+
+  // Sort
+  if (sortBy === 'name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sortBy === 'versions') list.sort((a,b)=>b.versions.length-a.versions.length);
+  else if (sortBy === 'starred') list.sort((a,b)=>(b.starred?1:0)-(a.starred?1:0));
+  else list.sort((a,b)=>b.createdAt-a.createdAt);
+
+  return list;
+}
+
+function render() {
+  const list = getFiltered();
+  const container = document.getElementById('artifactList');
+  container.className = 'artifact-list' + (viewMode==='grid'?' grid-view':'');
+
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⬡</div>No artifacts match this filter</div>`;
+    return;
+  }
+
+  const folder = FOLDERS.find(f=>f.id===currentFolderId);
+  document.getElementById('viewSub').textContent = `${list.length} artifact${list.length!==1?'s':''} · ${folder?folder.name+' · ':''}Personal workspace`;
+
+  // For duplicates view, insert a group header each time the name changes
+  let lastDupeName = null;
+
+  container.innerHTML = list.map(a => {
+    const type = typeOf(a.name);
+    const emoji = emojiOf(type);
+    const preferred = a.versions.find(v=>v.preferred);
+    const isExpanded = expandedId === a.id;
+    const f = FOLDERS.find(f=>f.id===a.folder);
+    const tagsHtml = (a.tags||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('');
+
+    const versionsHtml = a.versions.map(v => `
+      <div class="version-row">
+        <div class="version-tag${v.preferred?' preferred':''}">${v.v}</div>
+        ${v.preferred ? '<span class="preferred-badge">★ preferred</span>' : ''}
+        <div class="version-note">${v.note||''}</div>
+        <div class="version-date">${formatDate(v.savedAt)}</div>
+        <button class="version-star${v.preferred?' starred':''}" onclick="event.stopPropagation();showToast('Version ${v.v} marked as preferred')" title="Mark preferred">★</button>
+      </div>
+    `).join('');
+
+    // Group header for duplicates view
+    let groupHeader = '';
+    if (currentView === 'dupes' && a.name !== lastDupeName) {
+      lastDupeName = a.name;
+      groupHeader = `<div style="padding:10px 14px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--red);opacity:.7">${a.name}</div>`;
+    }
+
+    return `${groupHeader}
+    <div class="artifact-card${isExpanded?' expanded':''}" id="card-${a.id}"
+         draggable="true"
+         ondragstart="onArtifactDragStart(event,${a.id})"
+         ondragend="onDragEnd(event)"
+         oncontextmenu="showCtx(event,${a.id})">
+      <div class="card-main" onclick="toggleCard(${a.id})">
+        <span class="drag-handle" title="Drag to move folder">⠿</span>
+        <div class="type-badge type-${type}">${emoji}</div>
+        <div class="card-info">
+          <span class="card-name">${a.name}</span>
+          ${currentView === 'dupes' ? `<div style="display:inline-flex;align-items:center;gap:5px;margin:3px 0 2px;padding:2px 8px;background:var(--surface2);border:1px solid var(--border2);border-radius:5px;font-size:11px;font-weight:600;color:var(--text)">${f ? f.icon+' '+f.name : '📁 No folder'}</div>` : ''}
+          <div class="card-desc">${a.desc||''}</div>
+          <div class="card-meta">
+            ${currentView !== 'dupes' ? `<span style="font-size:10px;color:${f ? 'var(--muted)' : 'var(--amber)'}">${f ? f.icon+' '+f.name : '📂 Unassigned'}</span>` : ''}
+            <div class="card-tags">${tagsHtml}</div>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="version-count">${a.versions.length}v${preferred?` ★`:''}</span>
+          <button class="star-btn${a.starred?' starred':''}" onclick="event.stopPropagation();toggleStar(${a.id})">${a.starred?'★':'☆'}</button>
+          <span class="expand-icon">▾</span>
+        </div>
+      </div>
+      <div class="version-drawer${isExpanded?' open':''}">
+        <div class="drawer-header">Version History${preferred?` · <span style="color:var(--amber)">★ ${preferred.v} preferred</span>`:''}
+        </div>
+        ${versionsHtml}
+        <div class="card-action-row">
+          <button class="act-btn${a._attachedFile?' attach-ok':''}" onclick="event.stopPropagation();triggerAttach(${a.id})" title="Attach the actual file to this artifact">📎 ${a._attachedFile?'Re-attach':'Attach'}</button>
+          ${a._attachedFile?`<button class="act-btn" onclick="event.stopPropagation();downloadAttached(${a.id})" title="Download attached file">⬇ Download</button>`:''}
+          <button class="act-btn" onclick="event.stopPropagation();toggleRebuild(${a.id})" title="Generate a rebuild prompt to paste into Claude">🤖 Rebuild</button>
+        </div>
+        <input type="file" id="attach-${a.id}" style="display:none" onchange="attachFile(${a.id},this)">
+        <div class="rebuild-box" id="rebuild-${a.id}">
+          <div class="rebuild-title">📋 Paste this into Claude to rebuild:</div>
+          <div class="rebuild-prompt" id="rebuild-text-${a.id}">${buildRebuildPrompt(a)}</div>
+          <button class="copy-btn" onclick="copyRebuild(${a.id})">📋 Copy Prompt</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'});
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────────────────
+function toggleCard(id) {
+  expandedId = expandedId === id ? null : id;
+  const a = ARTIFACTS.find(x=>x.id===id);
+  render();
+  if (a) updateDetail(a);
+}
+
+function toggleStar(id) {
+  const a = ARTIFACTS.find(x=>x.id===id);
+  if (!a) return;
+  a.starred = !a.starred;
+  a._updatedAt = Date.now();
+  lsSave();
+  showToast(a.starred ? `★ ${a.name} added to favourites` : `${a.name} removed from favourites`);
+  document.getElementById('count-starred').textContent = ARTIFACTS.filter(a=>a.starred).length;
+  document.getElementById('stat-starred').textContent = ARTIFACTS.filter(a=>a.starred).length;
+  render();
+}
+
+function selectView(view, el) {
+  currentView = view;
+  currentFolderId = null;
+  expandedId = null;
+  document.querySelectorAll('.nav-item,.starred-nav,.folder-row').forEach(e=>e.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const titles = { all:'All Artifacts', starred:'Favourites', recent:'Recent', dupes:'Duplicates', unassigned:'📂 Unassigned' };
+  document.getElementById('viewTitle').textContent = titles[view] || view;
+  render();
+}
+
+function selectFolder(folderId, el) {
+  currentView = 'folder';
+  currentFolderId = folderId;
+  expandedId = null;
+  document.querySelectorAll('.nav-item,.starred-nav,.folder-row').forEach(e => e.classList.remove('active'));
+  // Mark the clicked row active (el may be the row itself or a child)
+  const row = document.getElementById('fnav-' + folderId);
+  if (row) row.classList.add('active');
+  const f = FOLDERS.find(f => f.id === folderId);
+  document.getElementById('viewTitle').textContent = f ? `${f.icon} ${f.name}` : 'Folder';
+  render();
+}
+
+function filterType(type, el) {
+  currentType = type;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  expandedId = null;
+  render();
+}
+
+function doSearch() {
+  searchTerm = document.getElementById('searchInput').value;
+  expandedId = null;
+  render();
+}
+
+function doSort(val) { sortBy = val; render(); }
+
+function setView(mode) {
+  viewMode = mode;
+  document.getElementById('listViewBtn').classList.toggle('active', mode==='list');
+  document.getElementById('gridViewBtn').classList.toggle('active', mode==='grid');
+  expandedId = null;
+  render();
+}
+
+function updateDetail(a) {
+  const type = typeOf(a.name);
+  const preferred = a.versions.find(v=>v.preferred);
+  const folder = FOLDERS.find(f=>f.id===a.folder);
+  document.getElementById('selectedDetail').innerHTML = `
+    <div class="detail-section-title">${emojiOf(type)} Selected</div>
+    <div class="detail-row">
+      <div class="detail-label">Name</div>
+      <div class="detail-value mono">${a.name}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Description</div>
+      <div class="detail-value" style="font-size:12px">${a.desc||'—'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Folder</div>
+      <div class="detail-value">${folder?`${folder.icon} ${folder.name}`:'—'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Versions</div>
+      <div class="detail-value">${a.versions.length} tracked</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Preferred</div>
+      <div class="detail-value" style="color:var(--amber)">${preferred?`★ ${preferred.v} — "${preferred.note}"`:'None set'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Tags</div>
+      <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:2px">${(a.tags||[]).map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Created</div>
+      <div class="detail-value">${formatDate(a.createdAt)}</div>
+    </div>
+  `;
+}
+
+// CONTEXT MENU
+let ctxTarget = null;
+function showCtx(e, id) {
+  e.preventDefault();
+  ctxTarget = id;
+  const m = document.getElementById('ctxMenu');
+  m.style.left = Math.min(e.clientX, window.innerWidth-180)+'px';
+  m.style.top = Math.min(e.clientY, window.innerHeight-160)+'px';
+  m.classList.add('show');
+}
+function ctxAction(action) {
+  const a = ARTIFACTS.find(x=>x.id===ctxTarget);
+  if (action === 'edit') { document.getElementById('ctxMenu').classList.remove('show'); openArtifactModal(ctxTarget); return; }
+  if (action === 'delete') { document.getElementById('ctxMenu').classList.remove('show'); if(a && confirm(`Delete "${a.name}"?`)){ARTIFACTS=ARTIFACTS.filter(x=>x.id!==ctxTarget);lsSave();buildSidebar();updateStats();render();showToast(`🗑 "${a.name}" deleted`);} return; }
+  const msgs = {
+    open:`Opening source conversation for ${a?.name}…`,
+    copy:`Duplicating ${a?.name}…`,
+    move: `Drag the card to a folder in the sidebar to move it`,
+    export:`Exporting ${a?.name}…`,
+  };
+  showToast('✦ ' + (msgs[action]||action));
+  document.getElementById('ctxMenu').classList.remove('show');
+}
+// Folder modal closes via Cancel/Save only (click-outside removed to prevent accidental close)
+document.addEventListener('click', ()=>document.getElementById('ctxMenu').classList.remove('show'));
+
+// ── ATTACH ────────────────────────────────────────────────────────────────
+function triggerAttach(id) {
+  const inp = document.getElementById('attach-' + id);
+  if (inp) inp.click();
+}
+
+function attachFile(artId, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const a = ARTIFACTS.find(x => x.id === artId);
+    if (!a) return;
+    a._attachedFile = { name: file.name, size: file.size, content: e.target.result, type: file.type };
+    a._updatedAt = Date.now();
+    const pref = a.versions.find(v => v.preferred) || a.versions[a.versions.length - 1];
+    if (pref) { pref._fileName = file.name; pref._fileSize = file.size; }
+    lsSave();
+    showToast(`📎 "${file.name}" attached to ${a.name}`);
+    render();
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function downloadAttached(artId) {
+  const a = ARTIFACTS.find(x => x.id === artId);
+  if (!a || !a._attachedFile) { showToast('No file attached'); return; }
+  const blob = new Blob([a._attachedFile.content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = a._attachedFile.name; link.click();
+  URL.revokeObjectURL(url);
+  showToast(`⬇ Downloading ${a._attachedFile.name}`);
+}
+
+// ── REBUILD ───────────────────────────────────────────────────────────────
+function buildRebuildPrompt(a) {
+  const pref = (a.versions || []).find(v => v.preferred) || a.versions?.[a.versions.length - 1];
+  const ver = pref ? pref.v : 'latest version';
+  const note = pref?.note ? ` (${pref.note})` : '';
+  const desc = a.desc ? ` ${a.desc}` : '';
+  return `Please re-send or rebuild "${a.name}" — ${ver}${note}.${desc}`.trim();
+}
+
+function toggleRebuild(id) {
+  const box = document.getElementById('rebuild-' + id);
+  if (!box) return;
+  // Update the prompt text in case versions changed
+  const a = ARTIFACTS.find(x => x.id === id);
+  if (a) {
+    const textEl = document.getElementById('rebuild-text-' + id);
+    if (textEl) textEl.textContent = buildRebuildPrompt(a);
+  }
+  box.classList.toggle('show');
+}
+
+function copyRebuild(id) {
+  const a = ARTIFACTS.find(x => x.id === id);
+  if (!a) return;
+  const prompt = buildRebuildPrompt(a);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(prompt)
+      .then(() => showToast('📋 Prompt copied — paste into Claude!'))
+      .catch(() => fallbackCopy(prompt));
+  } else { fallbackCopy(prompt); }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showToast('📋 Copied!'); }
+  catch { showToast('⚠ Copy manually from the box'); }
+  document.body.removeChild(ta);
+}
+
+// ── ARTIFACT MODAL ────────────────────────────────────────────────────────
+let _amPref = false;
+let _amFileContent = '';
+let _amFileName = '';
+let _amFileSize = 0;
+
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/1024/1024).toFixed(1) + ' MB';
+}
+
+// Called when user picks a file via + New button
+function onNewArtifactFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _amFileContent = e.target.result;
+    _amFileName    = file.name;
+    _amFileSize    = file.size;
+    openArtifactModal(null); // open modal pre-filled with file info
+  };
+  reader.readAsText(file);
+  input.value = ''; // reset so same file can be picked again
+}
+
+function buildFolderOptions(selectEl, selectedId) {
+  function collectOptions(parentId, depth) {
+    return FOLDERS.filter(f => (f.parentId || null) === (parentId || null)).flatMap(f => {
+      const indent = '　'.repeat(depth);
+      const opt = document.createElement('option');
+      opt.value = f.id;
+      opt.textContent = indent + f.icon + ' ' + f.name;
+      if (f.id === selectedId) opt.selected = true;
+      return [opt, ...collectOptions(f.id, depth + 1)];
+    });
+  }
+  selectEl.innerHTML = '<option value="">— No folder —</option>';
+  collectOptions(null, 0).forEach(o => selectEl.appendChild(o));
+}
+
+function toggleAMPref() {
+  _amPref = !_amPref;
+  document.getElementById('am-pref-switch').classList.toggle('on', _amPref);
+}
+
+function openArtifactModal(editId = null) {
+  _amPref = false;
+  document.getElementById('am-pref-switch').classList.remove('on');
+  document.getElementById('am-edit-id').value = editId ?? '';
+  document.getElementById('am-delete-btn').style.display = editId ? 'block' : 'none';
+  document.getElementById('artifactModalTitle').textContent = editId ? 'Edit Artifact' : 'New Artifact';
+
+  const banner = document.getElementById('am-file-banner');
+
+  if (editId) {
+    // Edit mode — load existing artifact data, no file pre-fill
+    _amFileContent = '';
+    _amFileName = '';
+    _amFileSize = 0;
+    banner.style.display = 'none';
+
+    const a = ARTIFACTS.find(x => x.id === editId);
+    if (!a) return;
+    document.getElementById('am-name').value = a.name;
+    document.getElementById('am-desc').value = a.desc || '';
+    document.getElementById('am-tags').value = (a.tags || []).join(', ');
+    const pref = a.versions.find(v => v.preferred) || a.versions[a.versions.length - 1];
+    document.getElementById('am-ver').value  = pref ? pref.v : 'v1';
+    document.getElementById('am-note').value = pref ? pref.note : '';
+    _amPref = !!pref?.preferred;
+    document.getElementById('am-pref-switch').classList.toggle('on', _amPref);
+    buildFolderOptions(document.getElementById('am-folder'), a.folder);
+
+    // Show existing attachment if present
+    if (a._attachedFile) {
+      _amFileContent = a._attachedFile.content;
+      _amFileName    = a._attachedFile.name;
+      _amFileSize    = a._attachedFile.size;
+      document.getElementById('am-file-name').textContent = _amFileName;
+      document.getElementById('am-file-size').textContent = formatBytes(_amFileSize) + ' · attached';
+      banner.style.display = 'flex';
+    }
+  } else {
+    // New artifact — pre-fill from file if one was picked
+    document.getElementById('am-desc').value  = '';
+    document.getElementById('am-tags').value  = '';
+    document.getElementById('am-ver').value   = 'v1';
+    document.getElementById('am-note').value  = 'Initial import';
+    buildFolderOptions(document.getElementById('am-folder'), currentFolderId);
+
+    if (_amFileName) {
+      document.getElementById('am-name').value = _amFileName;
+      document.getElementById('am-file-name').textContent = _amFileName;
+      document.getElementById('am-file-size').textContent = formatBytes(_amFileSize);
+      banner.style.display = 'flex';
+    } else {
+      document.getElementById('am-name').value = '';
+      banner.style.display = 'none';
+    }
+  }
+
+  document.getElementById('artifactModal').classList.add('show');
+  // Focus description if name is already filled (file import), otherwise name
+  const focusTarget = _amFileName && !editId ? 'am-desc' : 'am-name';
+  setTimeout(() => document.getElementById(focusTarget).focus(), 50);
+}
+
+function closeArtifactModal() {
+  document.getElementById('artifactModal').classList.remove('show');
+  _amFileContent = '';
+  _amFileName = '';
+  _amFileSize = 0;
+}
+
+function saveArtifactModal() {
+  const name = document.getElementById('am-name').value.trim();
+  if (!name) { showToast('⚠ Name is required'); return; }
+
+  const desc      = document.getElementById('am-desc').value.trim();
+  const tagsRaw   = document.getElementById('am-tags').value.trim();
+  const tags      = tagsRaw ? tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+  const ver       = document.getElementById('am-ver').value.trim() || 'v1';
+  const note      = document.getElementById('am-note').value.trim() || 'Initial import';
+  const folderRaw = document.getElementById('am-folder').value;
+  const folder    = folderRaw ? parseInt(folderRaw) : null;
+  const editId    = document.getElementById('am-edit-id').value;
+  const now       = Date.now();
+
+  if (editId) {
+    const a = ARTIFACTS.find(x => x.id === parseInt(editId));
+    if (!a) return;
+    a.name = name;
+    a.desc = desc;
+    a.tags = tags;
+    a.folder = folder;
+    a._updatedAt = now;
+    // Update file attachment if a new one was picked
+    if (_amFileContent) {
+      a._attachedFile = { name: _amFileName, size: _amFileSize, content: _amFileContent };
+      const pref = a.versions.find(v => v.preferred) || a.versions[a.versions.length - 1];
+      if (pref) { pref._fileName = _amFileName; pref.note = note; }
+    }
+    showToast(`✦ "${name}" updated`);
+  } else {
+    const newId = ARTIFACTS.length > 0 ? Math.max(...ARTIFACTS.map(a => a.id)) + 1 : 1;
+    const version = { v: ver, note, savedAt: now, preferred: _amPref };
+    if (_amFileContent) {
+      version._fileName = _amFileName;
+      version._fileSize = _amFileSize;
+    }
+    const artifact = {
+      id: newId, name, desc, folder, tags,
+      starred: false, createdAt: now, _updatedAt: now,
+      versions: [version]
+    };
+    // Attach file content directly if imported
+    if (_amFileContent) {
+      artifact._attachedFile = { name: _amFileName, size: _amFileSize, content: _amFileContent };
+    }
+    ARTIFACTS.push(artifact);
+    showToast(`✦ "${name}" imported`);
+  }
+
+  lsSave();
+  closeArtifactModal();
+  buildSidebar();
+  updateStats();
+  buildActivity();
+  render();
+}
+
+function deleteArtifactModal() {
+  const editId = parseInt(document.getElementById('am-edit-id').value);
+  const a = ARTIFACTS.find(x => x.id === editId);
+  if (!a) return;
+  if (!confirm(`Delete "${a.name}"? This cannot be undone.`)) return;
+  ARTIFACTS = ARTIFACTS.filter(x => x.id !== editId);
+  lsSave();
+  closeArtifactModal();
+  buildSidebar();
+  updateStats();
+  render();
+  showToast(`🗑 "${a.name}" deleted`);
+}
+
+// Close artifact modal on overlay click
+document.getElementById('artifactModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('artifactModal')) closeArtifactModal();
+});
+
+// ── DRAG AND DROP ─────────────────────────────────────────────────────────
+let dragType   = null;  // 'artifact' | 'folder'
+let dragArtId  = null;
+let dragFoldId = null;
+let lastDropTarget = null;
+const undoStack = []; // {type, artId, oldFolder, newFolder} or {type, foldId, oldParent, newParent}
+
+// ── Artifact dragging ─────────────────────────────────────────────────────
+function onArtifactDragStart(e, artId) {
+  dragType  = 'artifact';
+  dragArtId = artId;
+  dragFoldId = null;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', 'artifact:' + artId);
+  // Create a compact ghost instead of the full card
+  const art = ARTIFACTS.find(a => a.id === artId);
+  const ghost = document.createElement('div');
+  ghost.style.cssText = 'position:fixed;top:-999px;left:-999px;background:var(--accent);color:#fff;padding:6px 12px;border-radius:7px;font-size:12px;font-family:JetBrains Mono,monospace;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 12px rgba(0,0,0,.2);';
+  ghost.textContent = art ? art.name : 'artifact';
+  document.body.appendChild(ghost);
+  e.dataTransfer.setDragImage(ghost, 0, 0);
+  setTimeout(() => {
+    document.body.removeChild(ghost);
+    const el = document.getElementById('card-' + artId);
+    if (el) el.classList.add('dragging');
+  }, 0);
+}
+
+// ── Folder dragging ───────────────────────────────────────────────────────
+function onFolderDragStart(e, folderId) {
+  dragType   = 'folder';
+  dragFoldId = folderId;
+  dragArtId  = null;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', 'folder:' + folderId);
+  e.stopPropagation(); // don't bubble to parent folder rows
+}
+
+// ── Is folderId a descendant of ancestorId? (circular ref guard) ──────────
+function isFolderDescendant(folderId, ancestorId) {
+  if (folderId === ancestorId) return true;
+  const children = FOLDERS.filter(f => f.parentId === ancestorId);
+  return children.some(c => isFolderDescendant(folderId, c.id));
+}
+
+// ── Shared drag-over for folder rows ─────────────────────────────────────
+function onFolderDragOver(e, targetFolderId) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  // Clear previous highlight
+  if (lastDropTarget && lastDropTarget !== targetFolderId) {
+    const prev = document.getElementById('fnav-' + lastDropTarget);
+    if (prev) { prev.classList.remove('drop-target','drop-forbidden'); }
+  }
+  lastDropTarget = targetFolderId;
+  const row = document.getElementById('fnav-' + targetFolderId);
+  if (!row) return;
+
+  if (dragType === 'artifact') {
+    // Always valid to drop artifact onto any folder
+    e.dataTransfer.dropEffect = 'move';
+    row.classList.add('drop-target');
+    row.classList.remove('drop-forbidden');
+  } else if (dragType === 'folder') {
+    // Invalid: dropping onto itself or a descendant
+    const forbidden = dragFoldId === targetFolderId
+                   || isFolderDescendant(targetFolderId, dragFoldId);
+    if (forbidden) {
+      e.dataTransfer.dropEffect = 'none';
+      row.classList.add('drop-forbidden');
+      row.classList.remove('drop-target');
+    } else {
+      e.dataTransfer.dropEffect = 'move';
+      row.classList.add('drop-target');
+      row.classList.remove('drop-forbidden');
+    }
+  }
+}
+
+function onFolderDragLeave(e) {
+  // Only clear if leaving the row entirely (not entering a child element)
+  const row = e.currentTarget;
+  if (!row.contains(e.relatedTarget)) {
+    row.classList.remove('drop-target','drop-forbidden');
+  }
+}
+
+// ── Drop onto folder row ──────────────────────────────────────────────────
+function onFolderDrop(e, targetFolderId) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const row = document.getElementById('fnav-' + targetFolderId);
+  if (row) row.classList.remove('drop-target','drop-forbidden');
+  lastDropTarget = null;
+
+  if (dragType === 'artifact' && dragArtId !== null) {
+    // Move artifact to target folder
+    const a = ARTIFACTS.find(x => x.id === dragArtId);
+    if (!a) return;
+    const oldFolder = FOLDERS.find(f => f.id === a.folder);
+    const newFolder = FOLDERS.find(f => f.id === targetFolderId);
+    if (a.folder === targetFolderId) { showToast('Already in that folder'); return; }
+    const prevFolder = a.folder;
+    a.folder = targetFolderId;
+    a._updatedAt = Date.now();
+    undoStack.push({ type:'artifact', artId: a.id, oldFolder: prevFolder, newFolder: targetFolderId });
+    lsSave();
+    buildSidebar();
+    render();
+    showToast(`✦ Moved to ${newFolder ? newFolder.icon + ' ' + newFolder.name : 'folder'} · Ctrl+Z to undo`);
+
+  } else if (dragType === 'folder' && dragFoldId !== null) {
+    // Nest folder under target folder
+    if (dragFoldId === targetFolderId) return;
+    if (isFolderDescendant(targetFolderId, dragFoldId)) {
+      showToast('⚠ Cannot nest a folder inside its own descendant');
+      return;
+    }
+    const f = FOLDERS.find(x => x.id === dragFoldId);
+    const target = FOLDERS.find(x => x.id === targetFolderId);
+    if (!f) return;
+    const prevParent = f.parentId;
+    f.parentId = targetFolderId;
+    undoStack.push({ type:'folder', foldId: dragFoldId, oldParent: prevParent, newParent: targetFolderId });
+    // Make sure target is expanded so you can see the result
+    collapsedFolders.delete(targetFolderId);
+    lsSave();
+    buildSidebar();
+    showToast(`✦ ${f.icon} ${f.name} moved into ${target ? target.icon + ' ' + target.name : 'folder'} · Ctrl+Z to undo`);
+  }
+
+  dragType = dragArtId = dragFoldId = null;
+}
+
+function onDragEnd(e) {
+  // Clean up dragging class if drop happened outside a valid target
+  if (dragArtId !== null) {
+    const el = document.getElementById('card-' + dragArtId);
+    if (el) el.classList.remove('dragging');
+  }
+  // Clear any stray highlights
+  document.querySelectorAll('.drop-target,.drop-forbidden').forEach(el => {
+    el.classList.remove('drop-target','drop-forbidden');
+  });
+  dragType = dragArtId = dragFoldId = null;
+}
+
+function undoLastMove() {
+  if (!undoStack.length) { showToast('Nothing to undo'); return; }
+  const op = undoStack.pop();
+  if (op.type === 'artifact') {
+    const a = ARTIFACTS.find(x => x.id === op.artId);
+    if (!a) return;
+    a.folder = op.oldFolder;
+    a._updatedAt = Date.now();
+    const f = FOLDERS.find(f => f.id === op.oldFolder);
+    lsSave(); buildSidebar(); render();
+    showToast(`↩ Moved back to ${f ? f.icon + ' ' + f.name : 'Unassigned'}`);
+  } else if (op.type === 'folder') {
+    const f = FOLDERS.find(x => x.id === op.foldId);
+    if (!f) return;
+    f.parentId = op.oldParent;
+    lsSave(); buildSidebar();
+    showToast(`↩ Folder move undone`);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    // Don't intercept if user is typing in an input/textarea
+    if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+    e.preventDefault();
+    undoLastMove();
+  }
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg.startsWith('✦') ? msg : '✦ ' + msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+// ── GITHUB SYNC ───────────────────────────────────────────────────────────
+function ghConfig() {
+  return {
+    owner : localStorage.getItem(LS_GH_OWNER) || '',
+    repo  : localStorage.getItem(LS_GH_REPO)  || '',
+    path  : localStorage.getItem(LS_GH_PATH)  || 'artifacts.json',
+    pat   : localStorage.getItem(LS_GH_PAT)   || '',
+  };
+}
+
+function ghIsConfigured() {
+  const c = ghConfig();
+  return c.owner && c.repo && c.pat;
+}
+
+function updateGhStatusUI() {
+  const configured = ghIsConfigured();
+  const dot  = document.getElementById('ghDot');
+  const text = document.getElementById('ghStatusText');
+  const pushBtn = document.getElementById('ghPushBtn');
+  const pullBtn = document.getElementById('ghPullBtn');
+  if (!dot) return;
+
+  if (configured) {
+    const c = ghConfig();
+    dot.className = 'gh-dot connected';
+    text.textContent = c.owner + '/' + c.repo;
+    pushBtn.style.display = 'inline-flex';
+    pullBtn.style.display = 'inline-flex';
+  } else {
+    dot.className = 'gh-dot';
+    text.textContent = 'Not configured';
+    pushBtn.style.display = 'none';
+    pullBtn.style.display = 'none';
+  }
+
+  const dotModal  = document.getElementById('ghDotModal');
+  const panelText = document.getElementById('ghStatusPanelText');
+  const timesRow  = document.getElementById('ghTimesRow');
+  if (!dotModal) return;
+
+  if (configured) {
+    const c = ghConfig();
+    dotModal.className = 'gh-dot connected';
+    panelText.textContent = 'Connected: ' + c.owner + '/' + c.repo + '/' + c.path;
+    const pushed = localStorage.getItem(LS_GH_PUSHED);
+    const pulled = localStorage.getItem(LS_GH_PULLED);
+    if (pushed || pulled) {
+      timesRow.style.display = 'flex';
+      document.getElementById('ghLastPushLabel').textContent = pushed ? 'Pushed: ' + fmtGhTime(pushed) : 'Never pushed';
+      document.getElementById('ghLastPullLabel').textContent = pulled ? 'Pulled: ' + fmtGhTime(pulled) : 'Never pulled';
+    } else {
+      timesRow.style.display = 'none';
+    }
+  } else {
+    dotModal.className = 'gh-dot';
+    panelText.textContent = 'Not configured — fill in the fields below.';
+    timesRow.style.display = 'none';
+  }
+}
+
+function fmtGhTime(iso) {
+  var d = new Date(iso);
+  return d.toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function ghSetSyncing(syncing, error) {
+  const dot  = document.getElementById('ghDot');
+  const text = document.getElementById('ghStatusText');
+  if (!dot) return;
+  if (syncing) {
+    dot.className = 'gh-dot syncing';
+    text.textContent = 'Syncing...';
+  } else if (error) {
+    dot.className = 'gh-dot error';
+    text.textContent = error;
+  } else {
+    updateGhStatusUI();
+  }
+}
+
+async function ghPush() {
+  if (!ghIsConfigured()) { openSettingsModal(); return; }
+  if (!ARTIFACTS.length) { showToast('Nothing to push — catalogue is empty'); return; }
+  const c = ghConfig();
+  ghSetSyncing(true);
+
+  try {
+    // Fetch current remote and merge first so push never shrinks catalogue
+    let sha = localStorage.getItem(LS_GH_SHA) || null;
+    const check = await fetch(
+      'https://api.github.com/repos/' + c.owner + '/' + c.repo + '/contents/' + c.path,
+      { headers: { 'Authorization': 'token ' + c.pat, 'Accept': 'application/vnd.github+json' } }
+    );
+    if (check.ok) {
+      const remote = await check.json();
+      sha = remote.sha;
+      localStorage.setItem(LS_GH_SHA, sha);
+      try {
+        const jsonStr = decodeURIComponent(escape(atob(remote.content.replace(/\n/g,''))));
+        const payload = JSON.parse(jsonStr);
+        (payload.folders || []).forEach(function(f) {
+          if (!FOLDERS.find(function(x) { return x.id === f.id; })) FOLDERS.push(f);
+        });
+        (payload.artifacts || []).forEach(function(inc) {
+          const existing = ARTIFACTS.find(function(x) { return x.name === inc.name; });
+          if (!existing) {
+            const safeId = ARTIFACTS.length > 0 ? Math.max.apply(null, ARTIFACTS.map(function(a) { return a.id; })) + 1 : 1;
+            ARTIFACTS.push(Object.assign({}, inc, { id: safeId }));
+          } else {
+            const existingVTags = new Set(existing.versions.map(function(v) { return v.v; }));
+            (inc.versions || []).forEach(function(v) {
+              if (!existingVTags.has(v.v)) existing.versions.push(v);
+            });
+          }
+        });
+        lsSave();
+      } catch(mergeErr) {
+        console.warn('Pre-push merge failed, pushing as-is:', mergeErr);
+      }
+    }
+
+    const payload = { exportedAt: new Date().toISOString(), exportType: 'full', folders: FOLDERS, artifacts: ARTIFACTS };
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    const msgDate = new Date().toISOString().slice(0,16).replace('T',' ');
+
+    const body = { message: 'ArtyFarty sync ' + msgDate, content: content };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(
+      'https://api.github.com/repos/' + c.owner + '/' + c.repo + '/contents/' + c.path,
+      {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + c.pat, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'HTTP ' + res.status);
+    }
+
+    const result = await res.json();
+    const newSha = (result.content && result.content.sha) || (result.commit && result.commit.sha) || null;
+    if (newSha) localStorage.setItem(LS_GH_SHA, newSha);
+
+    const now = new Date().toISOString();
+    localStorage.setItem(LS_GH_PUSHED, now);
+    localStorage.setItem(LS_EXPORTED, now);
+    ghSetSyncing(false);
+    buildSidebar(); updateStats(); render();
+    showToast('Pushed ' + ARTIFACTS.length + ' artifacts to GitHub');
+
+  } catch(e) {
+    ghSetSyncing(false, 'Push failed');
+    showToast('Push failed: ' + e.message);
+    console.error('GitHub push error:', e);
+  }
+}
+
+async function ghPull() {
+  if (!ghIsConfigured()) { openSettingsModal(); return; }
+  const c = ghConfig();
+  ghSetSyncing(true);
+
+  try {
+    const res = await fetch(
+      'https://api.github.com/repos/' + c.owner + '/' + c.repo + '/contents/' + c.path,
+      { headers: { 'Authorization': 'token ' + c.pat, 'Accept': 'application/vnd.github+json' } }
+    );
+
+    if (res.status === 404) {
+      ghSetSyncing(false);
+      showToast('File not found in repo — Push first to create it');
+      return;
+    }
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'HTTP ' + res.status);
+    }
+
+    const data = await res.json();
+    localStorage.setItem(LS_GH_SHA, data.sha);
+    const jsonStr = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+    const payload = JSON.parse(jsonStr);
+
+    if (ARTIFACTS.length > 0) {
+      mergeData(payload);
+    } else {
+      initData(payload);
+    }
+
+    localStorage.setItem(LS_GH_PULLED, new Date().toISOString());
+    ghSetSyncing(false);
+    showToast('Pulled from GitHub');
+
+  } catch(e) {
+    ghSetSyncing(false, 'Pull failed');
+    showToast('Pull failed: ' + e.message);
+    console.error('GitHub pull error:', e);
+  }
+}
+
+function openSettingsModal() {
+  const c = ghConfig();
+  document.getElementById('gh-owner').value = c.owner || 'philliprichards26';
+  document.getElementById('gh-repo').value  = c.repo  || 'artyfarty';
+  document.getElementById('gh-path').value  = c.path  || 'artifacts.json';
+  document.getElementById('gh-pat').value   = c.pat;
+  updateGhStatusUI();
+  document.getElementById('settingsModal').classList.add('show');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settingsModal').classList.remove('show');
+}
+
+function saveGhSettings() {
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo  = document.getElementById('gh-repo').value.trim();
+  const path  = document.getElementById('gh-path').value.trim() || 'artifacts.json';
+  const pat   = document.getElementById('gh-pat').value.trim();
+
+  if (!owner || !repo || !pat) { showToast('Username, repo, and PAT are required'); return; }
+
+  localStorage.setItem(LS_GH_OWNER, owner);
+  localStorage.setItem(LS_GH_REPO,  repo);
+  localStorage.setItem(LS_GH_PATH,  path);
+  localStorage.setItem(LS_GH_PAT,   pat);
+  localStorage.removeItem(LS_GH_SHA);
+
+  closeSettingsModal();
+  updateGhStatusUI();
+  showToast('GitHub connected: ' + owner + '/' + repo);
+}
+
+function clearGhSettings() {
+  if (!confirm('Disconnect GitHub sync? Local catalogue unaffected.')) return;
+  [LS_GH_OWNER, LS_GH_REPO, LS_GH_PATH, LS_GH_PAT, LS_GH_SHA, LS_GH_PUSHED, LS_GH_PULLED].forEach(function(k) {
+    localStorage.removeItem(k);
+  });
+  closeSettingsModal();
+  updateGhStatusUI();
+  showToast('GitHub disconnected');
+}
+
+async function ghAutoPullOnLoad() {
+  if (!ghIsConfigured()) return;
+  const c = ghConfig();
+  try {
+    const res = await fetch(
+      'https://api.github.com/repos/' + c.owner + '/' + c.repo + '/contents/' + c.path,
+      { headers: { 'Authorization': 'token ' + c.pat, 'Accept': 'application/vnd.github+json' } }
+    );
+    if (!res.ok) return;
+    const data = await res.json();
+    const knownSha = localStorage.getItem(LS_GH_SHA);
+    if (knownSha && knownSha === data.sha) { showToast('GitHub: catalogue up to date'); return; }
+    localStorage.setItem(LS_GH_SHA, data.sha);
+    const jsonStr = decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+    const payload = JSON.parse(jsonStr);
+    mergeData(payload);
+    localStorage.setItem(LS_GH_PULLED, new Date().toISOString());
+    showToast('Auto-pulled updates from GitHub');
+  } catch(e) {
+    console.warn('GitHub auto-pull failed:', e);
+  }
+}
+</script>
+</body>
+</html>
