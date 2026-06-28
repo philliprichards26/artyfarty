@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T16:58:26.541Z",
+  "exportedAt": "2026-06-28T16:58:43.033Z",
   "exportType": "full",
   "folders": [
     {
@@ -897,7 +897,7 @@
       "id": 8225,
       "name": "leonidas_catalogue.pdf",
       "desc": "Professional A4 product catalogue generated from the Leonidas NCOM Excel file — 1191 articles, 28 familles, 2 gammes (Permanente & Saisonnière), with cover page, table of contents, and per-article table (Code CHC, Réf. fournisseur, Désignation, Dimensions, Colisage) in the Leonidas navy/gold palette.",
-      "folder": null,
+      "folder": 2,
       "tags": [
         "pdf",
         "reportlab",
@@ -909,7 +909,7 @@
       ],
       "starred": false,
       "createdAt": 1751057160000,
-      "_updatedAt": 1782665661464,
+      "_updatedAt": 1782665920424,
       "versions": [
         {
           "v": "v1",
