@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T16:58:10.764Z",
+  "exportedAt": "2026-06-28T16:58:26.541Z",
   "exportType": "full",
   "folders": [
     {
@@ -1258,7 +1258,7 @@
       "id": 8240,
       "name": "index.html",
       "desc": "Fictional 'Maison Duval' product catalogue demo with JS password gate (password: duval2026), category filters, search, product grid, and modal detail view — used to test Netlify free hosting end-to-end",
-      "folder": null,
+      "folder": 2,
       "tags": [
         "html",
         "catalogue",
@@ -1269,7 +1269,7 @@
       ],
       "starred": false,
       "createdAt": 1751109600000,
-      "_updatedAt": 1782665647588,
+      "_updatedAt": 1782665902202,
       "versions": [
         {
           "v": "v1",
