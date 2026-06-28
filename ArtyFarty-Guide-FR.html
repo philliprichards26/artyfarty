@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArtyFarty — Guide d'installation</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #f7f5f1;
+    --surface:  #ffffff;
+    --border:   #e8e2d8;
+    --border2:  #d5cdc2;
+    --text:     #1c1914;
+    --muted:    #7a7268;
+    --subtle:   #a8a09a;
+    --accent:   #d97757;
+    --accent-dk:#c26840;
+    --accent-bg:rgba(217,119,87,.09);
+    --accent-brd:rgba(217,119,87,.28);
+    --green:    #4a9868;
+    --code-bg:  #f0ece4;
+    --tag-bg:   #ede8e0;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .hero {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 24px 56px;
+    text-align: center;
+  }
+  .hero-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px;
+    background: linear-gradient(145deg, #d97757, #c06040);
+    border-radius: 18px;
+    font-size: 28px;
+    box-shadow: 0 4px 20px rgba(192,96,64,.22);
+    margin-bottom: 24px;
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 14px;
+  }
+  .hero-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700; letter-spacing: -.03em;
+    line-height: 1.12; margin-bottom: 18px;
+  }
+  .hero-title span { color: var(--accent); }
+  .hero-sub {
+    font-size: 17px; color: var(--muted);
+    max-width: 560px; margin: 0 auto 32px;
+    line-height: 1.65;
+  }
+  .hero-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .pill {
+    font-size: 12px; font-weight: 500; padding: 5px 13px;
+    border-radius: 20px; border: 1px solid var(--border2);
+    background: var(--tag-bg); color: var(--muted);
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .section { margin-top: 56px; }
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 28px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 600;
+    color: var(--accent); background: var(--accent-bg);
+    border: 1px solid var(--accent-brd);
+    padding: 3px 9px; border-radius: 5px; flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 20px; font-weight: 700; letter-spacing: -.02em;
+  }
+
+  .option-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .option-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .option-card.primary { border-color: var(--accent-brd); background: var(--accent-bg); }
+  .option-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--subtle); margin-bottom: 8px;
+  }
+  .option-card.primary .option-label { color: var(--accent); }
+  .option-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .option-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 600; color: var(--accent);
+    margin-top: 1px;
+  }
+  .step-body { flex: 1; min-width: 0; }
+  .step-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .step-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .step-desc strong { color: var(--text); font-weight: 600; }
+
+  pre, code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+  }
+  code {
+    background: var(--code-bg); color: var(--accent-dk);
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 12px;
+  }
+  pre {
+    background: #1c1914; color: #e8e2d8;
+    border-radius: 10px; padding: 18px 20px;
+    overflow-x: auto; margin: 14px 0;
+    line-height: 1.65; font-size: 12px;
+  }
+  pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+  .pre-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    color: var(--subtle); text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .callout {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px; margin: 16px 0;
+    font-size: 13.5px; color: var(--muted); line-height: 1.6;
+  }
+  .callout strong { color: var(--text); }
+
+  .perm-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  .perm-table th {
+    text-align: left; padding: 8px 12px;
+    background: var(--code-bg); color: var(--muted);
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .perm-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .perm-table tr:last-child td { border-bottom: none; }
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-rw { background: rgba(74,152,104,.1); color: var(--green); border: 1px solid rgba(74,152,104,.25); }
+  .badge-ro { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-brd); }
+
+  .skill-block {
+    background: #1c1914; border-radius: 12px;
+    padding: 24px; margin: 20px 0; position: relative;
+  }
+  .skill-block pre { background: none; padding: 0; margin: 0; color: #e8e2d8; font-size: 12px; }
+  .copy-btn {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+    color: #a8a09a; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; padding: 4px 10px; border-radius: 5px;
+    cursor: pointer; transition: all .15s;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,.15); color: #e8e2d8; }
+  .copy-btn.copied { color: var(--green); border-color: rgba(74,152,104,.4); }
+
+  .tips-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+  .tip {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+  }
+  .tip-icon { font-size: 18px; margin-bottom: 8px; }
+  .tip-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .tip-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  .faq { display: flex; flex-direction: column; gap: 0; }
+  .faq-item { padding: 18px 0; border-bottom: 1px solid var(--border); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-size: 14px; font-weight: 600; margin-bottom: 7px; }
+  .faq-a { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .faq-a a { color: var(--accent); text-decoration: none; }
+  .faq-a a:hover { text-decoration: underline; }
+
+  .cta-block {
+    margin-top: 64px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .cta-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  .cta-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+  .cta-btn {
+    display: inline-block;
+    background: var(--accent); color: white;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    padding: 12px 28px; border-radius: 9px; border: none;
+    cursor: pointer; text-decoration: none;
+    transition: background .15s;
+  }
+  .cta-btn:hover { background: var(--accent-dk); }
+
+  .footer {
+    text-align: center; padding: 32px 24px;
+    font-size: 12px; color: var(--subtle);
+    border-top: 1px solid var(--border); margin-top: 0;
+  }
+  .footer span { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 48px 20px 40px; }
+    .option-cards { grid-template-columns: 1fr; }
+    .tips-grid { grid-template-columns: 1fr; }
+    .page { padding: 0 16px 60px; }
+    .section { margin-top: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-mark">⬡</div>
+  <div class="hero-eyebrow">Guide d'installation</div>
+  <h1 class="hero-title">Vos artefacts Claude méritent<br><span>mieux que le néant</span></h1>
+  <p class="hero-sub">ArtyFarty est un gestionnaire d'artefacts personnel pour les utilisateurs de Claude. Cataloguez, versionnez, organisez et retrouvez tout ce que Claude crée pour vous — entre les conversations et sur tous vos appareils.</p>
+  <div class="hero-pills">
+    <span class="pill">🗂 Arborescence de dossiers</span>
+    <span class="pill">📌 Historique de versions</span>
+    <span class="pill">🔄 Sync GitHub</span>
+    <span class="pill">📎 Fichiers joints</span>
+    <span class="pill">🤖 Suivi de session</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- PARTIE 1 — L'APPLICATION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Partie 1</span>
+      <h2 class="section-title">L'application</h2>
+    </div>
+
+    <div class="option-cards">
+      <div class="option-card primary">
+        <div class="option-label">✦ Recommandé</div>
+        <div class="option-name">Version hébergée</div>
+        <div class="option-desc">Ouvrez dans n'importe quel navigateur — rien à installer. Vos données restent dans votre navigateur et votre GitHub.</div>
+      </div>
+      <div class="option-card">
+        <div class="option-label">Hors ligne</div>
+        <div class="option-name">Téléchargement local</div>
+        <div class="option-desc">Enregistrez le fichier HTML et ouvrez-le directement. Fonctionne complètement hors ligne.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>URL hébergée :</strong> <a href="https://philliprichards26.github.io/artyfarty" style="color:var(--accent)">philliprichards26.github.io/artyfarty</a><br>
+      Pour télécharger en local : clic droit sur la page → <strong>Enregistrer sous</strong> → ouvrir le fichier dans n'importe quel navigateur.
+    </div>
+
+    <p style="font-size:13.5px;color:var(--muted);margin-top:16px;">L'application est un fichier HTML autonome. Pas d'installation, pas de serveur, pas de dépendances. Toutes les données sont stockées dans le localStorage de votre navigateur et synchronisées optionnellement vers votre propre dépôt GitHub privé.</p>
+  </div>
+
+  <!-- FONCTIONNALITÉS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Fonctionnalités</span>
+      <h2 class="section-title">Ce que fait l'application</h2>
+    </div>
+    <div class="tips-grid">
+      <div class="tip">
+        <div class="tip-icon">🗂</div>
+        <div class="tip-title">Arborescence de dossiers</div>
+        <div class="tip-desc">Organisez les artefacts dans des dossiers et sous-dossiers avec des icônes personnalisées. Glissez les cartes entre dossiers ou imbriquez les dossiers.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📌</div>
+        <div class="tip-title">Historique de versions</div>
+        <div class="tip-desc">Chaque itération est suivie avec des notes. Marquez la version préférée avec ★ pour toujours savoir laquelle utiliser.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🔄</div>
+        <div class="tip-title">Sync GitHub</div>
+        <div class="tip-desc">Poussez et récupérez votre catalogue vers votre propre dépôt privé. Synchronisation automatique au chargement — votre catalogue vous suit sur tous vos appareils.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📎</div>
+        <div class="tip-title">Fichiers joints</div>
+        <div class="tip-desc">Attachez le vrai fichier à chaque carte pour le télécharger directement depuis le gestionnaire — sans fouiller dans d'anciennes conversations.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🔍</div>
+        <div class="tip-title">Recherche et filtres</div>
+        <div class="tip-desc">Recherche plein texte sur les noms, descriptions et tags. Filtrez par type de fichier — HTML, Python, Excel, JSON et plus de 30 autres.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">⭐</div>
+        <div class="tip-title">Favoris et vues</div>
+        <div class="tip-desc">Mettez en favori vos artefacts les plus utilisés. Vues dédiées pour Favoris, Récents, Doublons et Non classés — rien ne se perd.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">🤖</div>
+        <div class="tip-title">Prompt de reconstruction</div>
+        <div class="tip-desc">Chaque carte a un bouton Reconstruire — génère un prompt Claude pour recréer l'artefact depuis zéro si le fichier est perdu.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">⬇</div>
+        <div class="tip-title">Export et sauvegarde</div>
+        <div class="tip-desc">L'export complet sauvegarde tout le catalogue en JSON. L'export delta ne capture que les changements depuis le dernier export — pour une fusion rapide.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTIE 2 — SYNC GITHUB -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Partie 2</span>
+      <h2 class="section-title">Synchronisation GitHub</h2>
+    </div>
+
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:24px;">La sync permet à votre catalogue de vous suivre sur tous vos appareils. Vos métadonnées sont stockées en tant que <code>artifacts.json</code> dans un dépôt privé que vous contrôlez. Poussez après chaque session. Récupérez sur un nouvel appareil.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Créer un dépôt GitHub</div>
+          <div class="step-desc">
+            Allez sur <strong>github.com</strong> → cliquez <strong>+</strong> → <strong>New repository</strong>.<br>
+            Nommez-le comme vous voulez — ex. <code>mes-artefacts</code>. Mettez-le en <strong>Privé</strong>. Cliquez <strong>Create repository</strong>.<br><br>
+            Un compte GitHub gratuit suffit.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Créer un jeton d'accès personnel (PAT)</div>
+          <div class="step-desc">
+            Allez dans <strong>GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens</strong> → <strong>Generate new token</strong>.<br><br>
+            Configurez-le comme suit :
+          </div>
+          <table class="perm-table" style="margin-top:12px">
+            <tr><th>Paramètre</th><th>Valeur</th></tr>
+            <tr><td>Nom</td><td><code>ArtyFarty</code> (ou ce que vous souhaitez)</td></tr>
+            <tr><td>Expiration</td><td>90 jours ou plus</td></tr>
+            <tr><td>Accès au dépôt</td><td>Only select repositories → votre nouveau dépôt</td></tr>
+            <tr><td>Permission Contents</td><td><span class="badge badge-rw">Read &amp; write</span></td></tr>
+            <tr><td>Permission Metadata</td><td><span class="badge badge-ro">Read-only</span></td></tr>
+          </table>
+          <div class="callout" style="margin-top:12px">
+            <strong>Important :</strong> Copiez le jeton immédiatement après sa génération — GitHub ne le montre qu'une seule fois. Conservez-le dans votre gestionnaire de mots de passe pour pouvoir le coller sur de nouveaux appareils.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Connecter l'application</div>
+          <div class="step-desc">
+            Ouvrez l'application → cliquez <strong>⚙</strong> (en haut à droite) → renseignez :<br><br>
+            <strong>Owner</strong> — votre nom d'utilisateur GitHub<br>
+            <strong>Repo</strong> — le nom de votre dépôt<br>
+            <strong>File path</strong> — <code>artifacts.json</code><br>
+            <strong>Token</strong> — collez votre PAT<br><br>
+            Cliquez <strong>Save &amp; Connect</strong>, puis <strong>⬆ Push</strong> pour créer le fichier initial dans votre dépôt.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Utilisation au quotidien</div>
+          <div class="step-desc">
+            L'application se synchronise automatiquement au chargement quand elle est configurée. Cliquez <strong>⬆ Push</strong> après avoir ajouté ou modifié des artefacts. Sur un nouvel appareil, entrez le jeton une fois dans les Paramètres — puis Pull pour restaurer votre catalogue complet.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PARTIE 3 — SKILL SUIVI DE SESSION -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Partie 3</span>
+      <h2 class="section-title">Skill de suivi de session</h2>
+    </div>
+
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:24px;">Installez ce Skill Claude une fois et il enregistrera automatiquement tout ce que Claude crée pour vous à la fin de chaque conversation — en générant un JSON delta que vous pouvez fusionner dans votre catalogue en quelques secondes.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Installer le skill dans Claude</div>
+          <div class="step-desc">
+            Ouvrez Claude → <strong>panneau Skills</strong> (barre latérale gauche) → <strong>+ New Skill</strong>.<br>
+            Nommez-le <code>artifact-manager-session-tracker</code>.<br>
+            Définissez le déclencheur avec une commande slash — ex. <code>/artifact</code>.<br>
+            Collez le contenu du skill ci-dessous comme instructions.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Contenu du skill à coller</div>
+          <div class="skill-block">
+            <button class="copy-btn" onclick="copySkill(this)">Copier</button>
+            <pre id="skillContent">## Artifact Manager — Session Tracker
+
+**If no artifacts were produced in this conversation — do nothing.**
+
+If artifacts were produced, at session end generate the following
+without being asked:
+
+1. Print the filename in a copyable code block:
+   artifacts-delta-YYYY-MM-DD-topic.json
+   (topic = 2-3 word slug describing what was built)
+
+2. Generate the delta JSON as a downloadable file
+
+3. Produce each text artifact as a separate downloadable file
+   (.py, .html, .js, .ts, .jsx, .css, .sql, .md, .sh,
+    .yaml, .json, .xml, .txt)
+   Binary files (.pdf, .xlsx, .docx, .pptx, .zip) —
+   note these must be saved manually from earlier in the chat
+
+## Historical Mode
+If this skill is triggered on an old conversation, immediately
+scan the full conversation history and generate the JSON and
+individual files — do not wait for further instruction.
+
+## JSON Format
+{
+  "exportedAt": "ISO timestamp",
+  "exportType": "delta",
+  "exportFilename": "artifacts-delta-YYYY-MM-DD-topic.json",
+  "folders": [],
+  "artifacts": [
+    {
+      "id": 7342,
+      "name": "exact-filename.py",
+      "desc": "One sentence describing what this does",
+      "folder": null,
+      "tags": ["relevant", "tags"],
+      "starred": false,
+      "createdAt": 1751050000000,
+      "_updatedAt": 1751050000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "What this version does",
+          "preferred": false,
+          "savedAt": 1751040000000
+        },
+        {
+          "v": "v2",
+          "note": "Final working version",
+          "preferred": true,
+          "savedAt": 1751050000000
+        }
+      ]
+    }
+  ]
+}
+
+## Rules
+- Include EVERY file produced in the session
+- Use the exact filename as the artifact name
+- Mark the best/final version as "preferred": true
+- Start artifact IDs from a random number between 5000-9999
+- Set "folder": null — folders are assigned after importing
+- Export type is always "delta"</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Utilisation à la fin de chaque session</div>
+          <div class="step-desc">
+            Après que Claude a créé quelque chose pour vous, tapez :
+          </div>
+          <div class="pre-label" style="margin-top:12px">Déclencheur</div>
+          <pre><code>/artifact</code></pre>
+          <div class="step-desc" style="margin-top:8px">
+            Claude produit deux choses :<br><br>
+            <strong>① Un JSON delta</strong> — l'entrée de catalogue pour tout ce qui a été créé pendant la session. Téléchargez-le et fusionnez-le dans votre catalogue.<br><br>
+            <strong>② Les fichiers individuels</strong> — chaque fichier texte créé (.html, .py, .js, .md, .json, etc.) est proposé en téléchargement séparé. Téléchargez chacun et attachez-le à sa carte dans l'application via le bouton <strong>📎 Joindre</strong> — ainsi le vrai fichier accompagne les métadonnées.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Importer dans l'application</div>
+          <div class="step-desc">
+            Téléchargez le JSON delta → ouvrez l'application → <strong>⤴ Merge / load JSON</strong> → sélectionnez le fichier.<br>
+            Les nouveaux artefacts sont ajoutés sans toucher aux existants.<br><br>
+            Dépliez chaque nouvelle carte → <strong>📎 Joindre</strong> → sélectionnez le fichier téléchargé pour l'attacher.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PARTIE 4 — SKILL VERSIONS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Partie 4</span>
+      <h2 class="section-title">Skill de gestion des versions</h2>
+    </div>
+
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:24px;">Ce skill optionnel indique à Claude de ne jamais écraser un fichier directement — il sauvegarde toujours une copie versionnée au préalable. Si une modification tourne mal, la version précédente est à portée de main.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Installer le skill dans Claude</div>
+          <div class="step-desc">
+            Ouvrez Claude → <strong>panneau Skills</strong> → <strong>+ New Skill</strong>.<br>
+            Nommez-le <code>versioned-file-edits</code>. Collez le contenu ci-dessous.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Contenu du skill à coller</div>
+          <div class="skill-block">
+            <button class="copy-btn" onclick="copyVersionSkill(this)">Copier</button>
+            <pre id="versionSkillContent">## Versioned File Edits
+
+Never overwrite a file that already exists. Always create a
+versioned copy before or instead of overwriting.
+
+## Versioning Scheme
+
+Append a version suffix to the base filename before the extension:
+
+  original:  phillip-artifact-manager.html
+  version 2: phillip-artifact-manager-v2.html
+  version 3: phillip-artifact-manager-v3.html
+
+For files that already have a version number, increment it.
+For files with no version, start at v2 (the original is v1).
+
+## Workflow
+
+1. Write the edited content to the NEXT version filename
+2. Validate syntax before presenting:
+   - HTML/JS: extract and parse the script block with node
+   - Python: python3 -c "import ast; ast.parse(open('f').read())"
+   - JSON: python3 -c "import json; json.load(open('f'))"
+3. Keep only 2 versions: current + one rollback. Delete older ones.
+4. Present the new file, state the version, what changed,
+   and which version is available as rollback.
+
+If validation fails: fix the issue before presenting.
+Never present a file that has not been validated.
+Never skip validation because the change was "small".</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Fonctionnement en pratique</div>
+          <div class="step-desc">
+            Quand vous demandez à Claude de modifier un fichier, il sauvegarde automatiquement la version précédente comme copie de secours, valide la syntaxe du nouveau fichier, puis vous présente la version mise à jour.<br><br>
+            Vous avez toujours deux copies : la version courante et une version de secours — ce qui garde votre dossier propre tout en vous protégeant contre les mauvaises modifications ou les erreurs de troncature.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PARTIE 5 — CATALOGAGE HISTORIQUE -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Partie 5</span>
+      <h2 class="section-title">Cataloguer d'anciennes conversations</h2>
+    </div>
+
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:20px;">Vous avez déjà des mois de conversations Claude ? Vous pouvez les cataloguer rétroactivement.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Ouvrir une ancienne conversation</div>
+          <div class="step-desc">Naviguez vers n'importe quelle conversation passée où Claude a créé quelque chose pour vous.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Déclencher le skill</div>
+          <div class="step-desc">Tapez <code>/artifact</code> — Claude analyse tout l'historique de la conversation et génère le JSON et les fichiers immédiatement, sans autre instruction.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Fusionner et recommencer</div>
+          <div class="step-desc">Téléchargez et fusionnez dans votre catalogue comme d'habitude. Parcourez votre historique de conversations à votre rythme.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSEILS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">Conseils</span>
+      <h2 class="section-title">Tirer le meilleur parti de l'outil</h2>
+    </div>
+    <div class="tips-grid">
+      <div class="tip">
+        <div class="tip-icon">🔑</div>
+        <div class="tip-title">Un jeton par appareil</div>
+        <div class="tip-desc">Votre PAT est enregistré dans le localStorage du navigateur — collez-le une fois par nouveau navigateur ou appareil, il est ensuite mémorisé.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">⬆</div>
+        <div class="tip-title">Push après chaque session</div>
+        <div class="tip-desc">Gardez votre copie GitHub à jour. Si vous perdez le localStorage, un Pull restaure tout.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📂</div>
+        <div class="tip-title">Dossiers en premier</div>
+        <div class="tip-desc">Créez votre structure de dossiers avant d'importer, puis glissez les cartes au bon endroit. La vue Non classés récupère tout ce qui n'a pas de dossier.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📛</div>
+        <div class="tip-title">Noms cohérents</div>
+        <div class="tip-desc">La logique de fusion utilise le nom du fichier. Gardez des noms cohérents entre les sessions pour éviter les doublons.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">📎</div>
+        <div class="tip-title">Joindre les fichiers</div>
+        <div class="tip-desc">Chaque carte a un bouton Joindre. Attachez le vrai fichier pour pouvoir le télécharger directement depuis le gestionnaire plus tard.</div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">💻</div>
+        <div class="tip-title">Appareil principal</div>
+        <div class="tip-desc">Désignez un appareil comme principal pour les fichiers joints. Sur les autres appareils, utilisez le bouton Reconstruire — il génère un prompt Claude pour recréer l'artefact si le fichier n'est pas joint localement.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">FAQ</span>
+      <h2 class="section-title">Questions fréquentes</h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-q">Est-ce que mes données sont envoyées quelque part ?</div>
+        <div class="faq-a">Non. Tout reste dans le localStorage de votre navigateur et dans votre propre dépôt GitHub privé. L'application ne fait aucune requête externe sauf vers l'API GitHub avec votre propre jeton.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Que faire si je vide mon navigateur ou perds le localStorage ?</div>
+        <div class="faq-a">Faites un Pull depuis GitHub — votre catalogue est toujours sauvegardé là sous forme de <code>artifacts.json</code>. C'est pourquoi configurer la sync est recommandé.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Ça fonctionne sur mobile ?</div>
+        <div class="faq-a">Oui — l'application fonctionne dans Chrome et Safari mobile. La sync GitHub fonctionne de la même façon ; entrez votre PAT une fois dans les Paramètres et il est mémorisé pour ce navigateur.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">C'est gratuit ?</div>
+        <div class="faq-a">Complètement. Les comptes GitHub gratuits incluent des dépôts privés et l'accès API. L'application elle-même n'a aucun coût.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Puis-je l'héberger moi-même ?</div>
+        <div class="faq-a">Oui — téléchargez <code>index.html</code> et hébergez-le n'importe où (GitHub Pages, Netlify, ou ouvrez-le simplement en local). C'est un fichier unique sans étape de compilation ni dépendances.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Quelle est la bonne pratique pour les fichiers joints ?</div>
+        <div class="faq-a">Désignez un appareil comme principal — joignez les fichiers là et traitez-le comme référence. Les autres appareils récupèrent les métadonnées du catalogue via Pull mais n'auront pas les fichiers joints. Sur un appareil secondaire, utilisez le bouton <strong>🤖 Reconstruire</strong> sur n'importe quelle carte pour générer un prompt Claude qui recrée l'artefact depuis zéro.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Les fichiers joints sont-ils inclus dans le Push GitHub ?</div>
+        <div class="faq-a">Non — le Push synchronise uniquement les métadonnées du catalogue (<code>artifacts.json</code>). Les fichiers joints sont stockés uniquement dans le localStorage de votre navigateur. Conservez vos copies locales en sécurité, et utilisez le prompt de reconstruction comme solution de secours si un fichier est perdu.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Quelle est la différence entre Push et Export complet ?</div>
+        <div class="faq-a">Push synchronise votre catalogue vers GitHub (recommandé pour une utilisation multi-appareils). L'export complet télécharge une sauvegarde JSON locale sur votre ordinateur — utile comme copie de sécurité supplémentaire.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <div class="cta-title">Prêt à commencer ?</div>
+    <div class="cta-sub">Ouvrez l'application, chargez votre premier JSON depuis le skill de suivi, et votre catalogue est en ligne.</div>
+    <a class="cta-btn" href="https://philliprichards26.github.io/artyfarty" target="_blank">Ouvrir ArtyFarty →</a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Créé par <span>Phillip Richards</span> · ArtyFarty · Parce que vos artefacts méritent mieux que le néant
+</div>
+
+<script>
+function copySkill(btn) {
+  const text = document.getElementById('skillContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copié ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyVersionSkill(btn) {
+  const text = document.getElementById('versionSkillContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copié ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>
