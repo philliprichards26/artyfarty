@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T12:44:42.705Z",
+  "exportedAt": "2026-06-28T12:47:02.615Z",
   "exportType": "full",
   "folders": [
     {
@@ -52,19 +52,16 @@
     {
       "id": 8201,
       "name": "phillip-artifact-manager.html",
-      "desc": "Personal Claude Artifact Manager — Claude Design light theme, localStorage auto-save, full/delta export, smart merge import, recursive folder tree, drag-and-drop, file-first import, 35 file types, name-based merge matching",
+      "desc": "Artifact Manager with Github Sync",
       "folder": null,
       "tags": [
-        "html",
-        "localStorage",
-        "drag-drop",
-        "folders",
-        "personal",
-        "claude-design"
+        "github",
+        "sync",
+        "artifact"
       ],
       "starred": true,
       "createdAt": 1751050000000,
-      "_updatedAt": 1751110000000,
+      "_updatedAt": 1782649507076,
       "versions": [
         {
           "v": "v1",
@@ -119,18 +116,17 @@
     {
       "id": 8202,
       "name": "vortex-artifact-manager-demo.html",
-      "desc": "Anthropic pitch demo — Vortex Dynamics, 58 artifacts, 203 versions, 5 departments, 7 team members. Claude Design light theme, circular avatars, live team member filtering, star counter updates",
+      "desc": "Large-scale fictional company demo — Vortex Dynamics, 58 artifacts, 203 versions, 7 team members, 5 departments",
       "folder": null,
       "tags": [
         "demo",
         "Vortex",
-        "pitch",
-        "claude-design",
-        "team-filtering"
+        "fictional",
+        "scale"
       ],
       "starred": true,
       "createdAt": 1751000000000,
-      "_updatedAt": 1751110000000,
+      "_updatedAt": 1782572374963,
       "versions": [
         {
           "v": "v1",
@@ -1068,30 +1064,6 @@
       ]
     },
     {
-      "id": 8230,
-      "name": "Gantt_Vitrines_2026.xlsx",
-      "desc": "Gantt chart — 2026 vitrine planning: Gifting, Coupe du Monde, Fête des Profs, Frozettes campaigns",
-      "folder": 3,
-      "tags": [
-        "gantt",
-        "vitrines",
-        "campaigns",
-        "planning",
-        "excel"
-      ],
-      "starred": false,
-      "createdAt": 1748500000000,
-      "_updatedAt": 1748500000000,
-      "versions": [
-        {
-          "v": "v1",
-          "note": "Four campaigns, weekly view",
-          "preferred": true,
-          "savedAt": 1748500000000
-        }
-      ]
-    },
-    {
       "id": 8231,
       "name": "facturation-electronique.svg",
       "desc": "SVG network diagram — facturation électronique flow: CHC → dematerialisation platform → clients/suppliers/tax authority/PDPs",
@@ -1197,6 +1169,130 @@
     },
     {
       "id": 8236,
+      "name": "Planning_Ballotins.xlsx",
+      "desc": "Weekly ballotin production planner v1 — fixed person count per line per day, with targets, % complete and colour-coded KPIs for 250g/375g/500g formats.",
+      "folder": null,
+      "tags": [
+        "excel",
+        "production",
+        "planning",
+        "bilbodis",
+        "ballotins",
+        "chocolat"
+      ],
+      "starred": false,
+      "createdAt": 1751030400000,
+      "_updatedAt": 1751030400000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Initial version — person count input per format per day, targets section, weekly summary, 375+500 conflict check.",
+          "preferred": false,
+          "savedAt": 1751030400000
+        }
+      ]
+    },
+    {
+      "id": 8237,
+      "name": "Planning_Ballotins_v2.xlsx",
+      "desc": "Weekly ballotin planner v2 — dual input per format per day (hours + people), production calculated as H × P × cadence, daily person-hour validation.",
+      "folder": null,
+      "tags": [
+        "excel",
+        "production",
+        "planning",
+        "bilbodis",
+        "ballotins",
+        "chocolat"
+      ],
+      "starred": false,
+      "createdAt": 1751032200000,
+      "_updatedAt": 1751032200000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Hours + people dual input — rejected because fixed people per line blocked flexible day-splitting.",
+          "preferred": false,
+          "savedAt": 1751032200000
+        }
+      ]
+    },
+    {
+      "id": 8238,
+      "name": "Planning_Ballotins_v3.xlsx",
+      "desc": "Weekly ballotin planner v3 — single person-hours input per format per day, production = ph × cadence, max 35ph/day validation, 375g+500g conflict check.",
+      "folder": null,
+      "tags": [
+        "excel",
+        "production",
+        "planning",
+        "bilbodis",
+        "ballotins",
+        "chocolat"
+      ],
+      "starred": false,
+      "createdAt": 1751034000000,
+      "_updatedAt": 1751034000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Simplified to single person-hours input. Faisabilité calculated per format independently — bug identified (should be combined total).",
+          "preferred": false,
+          "savedAt": 1751034000000
+        }
+      ]
+    },
+    {
+      "id": 8239,
+      "name": "Planning_Ballotins_v4.xlsx",
+      "desc": "Weekly ballotin planner v4 — person-hours input per format per day, combined faisabilité row showing total ph needed across all formats and whether targets are achievable within the 5-day week.",
+      "folder": null,
+      "tags": [
+        "excel",
+        "production",
+        "planning",
+        "bilbodis",
+        "ballotins",
+        "chocolat"
+      ],
+      "starred": true,
+      "createdAt": 1751036000000,
+      "_updatedAt": 1751036000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Final working version — combined TOTAL row replaces per-format jours/faisabilité, shows combined ph needed and realistic feasibility message (e.g. '⚠ Nécessite 5.3 jours'). 55 formulas, zero errors.",
+          "preferred": true,
+          "savedAt": 1751036000000
+        }
+      ]
+    },
+    {
+      "id": 8240,
+      "name": "Gantt_Vitrines_2026.xlsx",
+      "desc": "Gantt chart — 2026 vitrine planning: Gifting, Coupe du Monde, Fête des Profs, Frozettes campaigns",
+      "folder": 3,
+      "tags": [
+        "gantt",
+        "vitrines",
+        "campaigns",
+        "planning",
+        "excel"
+      ],
+      "starred": false,
+      "createdAt": 1748500000000,
+      "_updatedAt": 1748500000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Four campaigns, weekly view",
+          "preferred": true,
+          "savedAt": 1748500000000
+        }
+      ]
+    },
+    {
+      "id": 8241,
       "name": "carte_visite_template.docx",
       "desc": "Business card Word template — recto-verso 85×54mm, photo placeholders, zero margins, print-ready",
       "folder": 7,
@@ -1220,6 +1316,7 @@
     }
   ],
   "deletedNames": [
-    "carte_visite_template.docx"
+    "carte_visite_template.docx",
+    "Gantt_Vitrines_2026.xlsx"
   ]
 }
