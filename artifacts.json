@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T14:00:50.929Z",
+  "exportedAt": "2026-06-28T16:55:34.675Z",
   "exportType": "full",
   "folders": [
     {
@@ -46,6 +46,12 @@
       "name": "Bilbodis",
       "icon": "📁",
       "parentId": null
+    },
+    {
+      "id": 9,
+      "name": "Vortex Demo",
+      "icon": "💡",
+      "parentId": 6
     }
   ],
   "artifacts": [
@@ -53,7 +59,7 @@
       "id": 8201,
       "name": "phillip-artifact-manager.html",
       "desc": "Artifact Manager with Github Sync",
-      "folder": null,
+      "folder": 6,
       "tags": [
         "github",
         "sync",
@@ -61,7 +67,7 @@
       ],
       "starred": true,
       "createdAt": 1751050000000,
-      "_updatedAt": 1782649507076,
+      "_updatedAt": 1782665668627,
       "versions": [
         {
           "v": "v1",
@@ -123,7 +129,7 @@
       "id": 8202,
       "name": "vortex-artifact-manager-demo.html",
       "desc": "Large-scale fictional company demo — Vortex Dynamics, 58 artifacts, 203 versions, 7 team members, 5 departments",
-      "folder": null,
+      "folder": 9,
       "tags": [
         "demo",
         "Vortex",
@@ -132,7 +138,7 @@
       ],
       "starred": true,
       "createdAt": 1751000000000,
-      "_updatedAt": 1782572374963,
+      "_updatedAt": 1782665730806,
       "versions": [
         {
           "v": "v1",
@@ -891,7 +897,7 @@
       "id": 8225,
       "name": "leonidas_catalogue.pdf",
       "desc": "Professional A4 product catalogue generated from the Leonidas NCOM Excel file — 1191 articles, 28 familles, 2 gammes (Permanente & Saisonnière), with cover page, table of contents, and per-article table (Code CHC, Réf. fournisseur, Désignation, Dimensions, Colisage) in the Leonidas navy/gold palette.",
-      "folder": null,
+      "folder": 2,
       "tags": [
         "pdf",
         "reportlab",
@@ -903,7 +909,7 @@
       ],
       "starred": false,
       "createdAt": 1751057160000,
-      "_updatedAt": 1751057160000,
+      "_updatedAt": 1782665661464,
       "versions": [
         {
           "v": "v1",
@@ -917,7 +923,7 @@
       "id": 8226,
       "name": "build_catalogue.py",
       "desc": "Python script using openpyxl + ReportLab to parse the 5-column Leonidas NCOM Excel catalogue and render a multi-section A4 PDF with custom page templates, numbered canvas, TOC, and branded colour palette.",
-      "folder": null,
+      "folder": 2,
       "tags": [
         "python",
         "reportlab",
@@ -929,7 +935,7 @@
       ],
       "starred": false,
       "createdAt": 1751057100000,
-      "_updatedAt": 1751057100000,
+      "_updatedAt": 1782665664652,
       "versions": [
         {
           "v": "v1",
@@ -1152,7 +1158,7 @@
       "id": 8236,
       "name": "Planning_Ballotins.xlsx",
       "desc": "Weekly ballotin production planner v1 — fixed person count per line per day, with targets, % complete and colour-coded KPIs for 250g/375g/500g formats.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1163,7 +1169,7 @@
       ],
       "starred": false,
       "createdAt": 1751030400000,
-      "_updatedAt": 1751030400000,
+      "_updatedAt": 1782665679153,
       "versions": [
         {
           "v": "v1",
@@ -1177,7 +1183,7 @@
       "id": 8237,
       "name": "Planning_Ballotins_v2.xlsx",
       "desc": "Weekly ballotin planner v2 — dual input per format per day (hours + people), production calculated as H × P × cadence, daily person-hour validation.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1188,7 +1194,7 @@
       ],
       "starred": false,
       "createdAt": 1751032200000,
-      "_updatedAt": 1751032200000,
+      "_updatedAt": 1782665681408,
       "versions": [
         {
           "v": "v1",
@@ -1202,7 +1208,7 @@
       "id": 8238,
       "name": "Planning_Ballotins_v3.xlsx",
       "desc": "Weekly ballotin planner v3 — single person-hours input per format per day, production = ph × cadence, max 35ph/day validation, 375g+500g conflict check.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1213,7 +1219,7 @@
       ],
       "starred": false,
       "createdAt": 1751034000000,
-      "_updatedAt": 1751034000000,
+      "_updatedAt": 1782665685939,
       "versions": [
         {
           "v": "v1",
@@ -1227,7 +1233,7 @@
       "id": 8239,
       "name": "Planning_Ballotins_v4.xlsx",
       "desc": "Weekly ballotin planner v4 — person-hours input per format per day, combined faisabilité row showing total ph needed across all formats and whether targets are achievable within the 5-day week.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1238,7 +1244,7 @@
       ],
       "starred": true,
       "createdAt": 1751036000000,
-      "_updatedAt": 1751036000000,
+      "_updatedAt": 1782665688608,
       "versions": [
         {
           "v": "v1",
@@ -1252,7 +1258,7 @@
       "id": 8240,
       "name": "index.html",
       "desc": "Fictional 'Maison Duval' product catalogue demo with JS password gate (password: duval2026), category filters, search, product grid, and modal detail view — used to test Netlify free hosting end-to-end",
-      "folder": null,
+      "folder": 2,
       "tags": [
         "html",
         "catalogue",
@@ -1263,7 +1269,7 @@
       ],
       "starred": false,
       "createdAt": 1751109600000,
-      "_updatedAt": 1782651218891,
+      "_updatedAt": 1782665647588,
       "versions": [
         {
           "v": "v1",
