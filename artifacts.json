@@ -1,26 +1,30 @@
 {
-  "exportedAt": "2026-06-28T11:33:14.048Z",
+  "exportedAt": "2026-06-28T12:21:50.630Z",
   "exportType": "full",
   "folders": [
     {
       "id": 1,
-      "name": "Bilbodis — Logistique",
-      "icon": "🚚"
+      "name": "Transport",
+      "icon": "🚚",
+      "parentId": 8
     },
     {
       "id": 2,
-      "name": "Bilbodis — Catalogue",
-      "icon": "🍫"
+      "name": "NCOM Catalogue",
+      "icon": "🍫",
+      "parentId": 8
     },
     {
       "id": 3,
-      "name": "Bilbodis — Finance & Planning",
-      "icon": "📊"
+      "name": "Prepack",
+      "icon": "📊",
+      "parentId": 8
     },
     {
       "id": 4,
       "name": "Bilbodis — Compliance",
-      "icon": "⚖️"
+      "icon": "⚖️",
+      "parentId": 8
     },
     {
       "id": 5,
@@ -36,6 +40,12 @@
       "id": 7,
       "name": "Divers",
       "icon": "📁"
+    },
+    {
+      "id": 8,
+      "name": "Bilbodis",
+      "icon": "📁",
+      "parentId": null
     }
   ],
   "artifacts": [
@@ -578,7 +588,7 @@
       "id": 8214,
       "name": "transport-kpi.xlsx",
       "desc": "Transport KPI dashboard — weekly operational data, carrier tariff comparison, CNR fuel formula",
-      "folder": 3,
+      "folder": 1,
       "tags": [
         "excel",
         "KPI",
@@ -616,7 +626,8 @@
           "preferred": false,
           "savedAt": 1749340800000
         }
-      ]
+      ],
+      "_updatedAt": 1782649227710
     },
     {
       "id": 8215,
@@ -881,29 +892,6 @@
           "content": "",
           "preferred": true,
           "savedAt": 1750377600000
-        }
-      ]
-    },
-    {
-      "id": 8224,
-      "name": "carte_visite_template.docx",
-      "desc": "Business card Word template — recto-verso 85×54mm, photo placeholders, zero margins, print-ready",
-      "folder": 7,
-      "tags": [
-        "word",
-        "business-card",
-        "template",
-        "print"
-      ],
-      "starred": false,
-      "createdAt": 1749340800000,
-      "versions": [
-        {
-          "v": "v1",
-          "note": "Two-page template with colour-coded placeholders",
-          "content": "",
-          "preferred": true,
-          "savedAt": 1749340800000
         }
       ]
     },
@@ -1175,6 +1163,29 @@
           "note": "Full prompt with JSON format, rules, and trigger phrase",
           "preferred": true,
           "savedAt": 1751060000000
+        }
+      ]
+    },
+    {
+      "id": 8234,
+      "name": "carte_visite_template.docx",
+      "desc": "Business card Word template — recto-verso 85×54mm, photo placeholders, zero margins, print-ready",
+      "folder": 7,
+      "tags": [
+        "word",
+        "business-card",
+        "template",
+        "print"
+      ],
+      "starred": false,
+      "createdAt": 1749340800000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Two-page template with colour-coded placeholders",
+          "content": "",
+          "preferred": true,
+          "savedAt": 1749340800000
         }
       ]
     }
