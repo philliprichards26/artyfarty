@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T11:32:29.462Z",
+  "exportedAt": "2026-06-28T11:33:14.048Z",
   "exportType": "full",
   "folders": [
     {
@@ -384,6 +384,18 @@
           "content": "",
           "preferred": true,
           "savedAt": 1749686400000
+        },
+        {
+          "v": "v2",
+          "note": "Client autocomplete — 90-shop dataset",
+          "preferred": false,
+          "savedAt": 1746673600000
+        },
+        {
+          "v": "v3",
+          "note": "Category taxonomy + CSV export — full build",
+          "preferred": true,
+          "savedAt": 1746846400000
         }
       ]
     },
@@ -944,6 +956,225 @@
           "note": "Complete build script — loads data, defines styles, page templates (cover + content), TOC builder, product table builder, category/family/sub-family banners, NumberedCanvas for page numbering. Outputs to /mnt/user-data/outputs/.",
           "preferred": true,
           "savedAt": 1751057100000
+        }
+      ]
+    },
+    {
+      "id": 8227,
+      "name": "easjb-basketball.html",
+      "desc": "EASJB basketball club website — FFBB live data via ffbb-api-client-v2, scores & standings, GitHub Actions + Netlify CI/CD",
+      "folder": 2,
+      "tags": [
+        "basketball",
+        "FFBB",
+        "club",
+        "sports",
+        "Netlify"
+      ],
+      "starred": false,
+      "createdAt": 1748000000000,
+      "_updatedAt": 1748432000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Static site structure",
+          "preferred": false,
+          "savedAt": 1748000000000
+        },
+        {
+          "v": "v2",
+          "note": "FFBB API integration — live scores & standings",
+          "preferred": false,
+          "savedAt": 1748259200000
+        },
+        {
+          "v": "v3",
+          "note": "GitHub Actions deploy pipeline",
+          "preferred": true,
+          "savedAt": 1748432000000
+        }
+      ]
+    },
+    {
+      "id": 8228,
+      "name": "Bilbodis_Planning_2026.xlsx",
+      "desc": "2026 annual planning calendar — EXP/CC/COM data by week, holiday highlights, Leonidas campaign markers",
+      "folder": 3,
+      "tags": [
+        "planning",
+        "calendar",
+        "bilbodis",
+        "2026",
+        "excel"
+      ],
+      "starred": true,
+      "createdAt": 1740000000000,
+      "_updatedAt": 1750032000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Initial structure — weeks & public holidays",
+          "preferred": false,
+          "savedAt": 1740000000000
+        },
+        {
+          "v": "v2",
+          "note": "EXP/CC/COM columns added + campaign markers",
+          "preferred": false,
+          "savedAt": 1740432000000
+        },
+        {
+          "v": "v3",
+          "note": "Q2 gantt overlay + colour coding finalised",
+          "preferred": false,
+          "savedAt": 1740864000000
+        },
+        {
+          "v": "v6",
+          "note": "Final agreed layout — months as columns, embedded prior year data",
+          "preferred": true,
+          "savedAt": 1750032000000
+        }
+      ]
+    },
+    {
+      "id": 8229,
+      "name": "Power_Query_Extractions.xlsx",
+      "desc": "M-language Power Query transformations — supplier ordering, stock extraction, fill-down for merged cells, LEONIDAS COM/NCOM filtered queries",
+      "folder": 3,
+      "tags": [
+        "power-query",
+        "M-language",
+        "excel",
+        "stock",
+        "leonidas"
+      ],
+      "starred": false,
+      "createdAt": 1738000000000,
+      "_updatedAt": 1738604800000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Column removal + fill-down for merged cells",
+          "preferred": false,
+          "savedAt": 1738000000000
+        },
+        {
+          "v": "v2",
+          "note": "Code/name splitting added",
+          "preferred": false,
+          "savedAt": 1738259200000
+        },
+        {
+          "v": "v3",
+          "note": "LEONIDAS COM filtered query",
+          "preferred": false,
+          "savedAt": 1738432000000
+        },
+        {
+          "v": "v4",
+          "note": "LEONIDAS NCOM query + combined output",
+          "preferred": true,
+          "savedAt": 1738604800000
+        }
+      ]
+    },
+    {
+      "id": 8230,
+      "name": "Gantt_Vitrines_2026.xlsx",
+      "desc": "Gantt chart — 2026 vitrine planning: Gifting, Coupe du Monde, Fête des Profs, Frozettes campaigns",
+      "folder": 3,
+      "tags": [
+        "gantt",
+        "vitrines",
+        "campaigns",
+        "planning",
+        "excel"
+      ],
+      "starred": false,
+      "createdAt": 1748500000000,
+      "_updatedAt": 1748500000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Four campaigns, weekly view",
+          "preferred": true,
+          "savedAt": 1748500000000
+        }
+      ]
+    },
+    {
+      "id": 8231,
+      "name": "facturation-electronique.svg",
+      "desc": "SVG network diagram — facturation électronique flow: CHC → dematerialisation platform → clients/suppliers/tax authority/PDPs",
+      "folder": 4,
+      "tags": [
+        "compliance",
+        "e-billing",
+        "SVG",
+        "diagram"
+      ],
+      "starred": false,
+      "createdAt": 1747000000000,
+      "_updatedAt": 1747172800000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Initial flow diagram",
+          "preferred": false,
+          "savedAt": 1747000000000
+        },
+        {
+          "v": "v2",
+          "note": "Tax authority node + PDPs added",
+          "preferred": true,
+          "savedAt": 1747172800000
+        }
+      ]
+    },
+    {
+      "id": 8232,
+      "name": "Claude_Artifact_Manager_Case_Study.docx",
+      "desc": "Case study: lost the working demo while building it — 4 failure modes, prevention table, 'Claude cannot save its own work safely' argument",
+      "folder": 6,
+      "tags": [
+        "case-study",
+        "Anthropic",
+        "pitch",
+        "artifact-manager"
+      ],
+      "starred": true,
+      "createdAt": 1751000000000,
+      "_updatedAt": 1751000000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Full case study — timeline, failure modes, filing cabinet analogy",
+          "preferred": true,
+          "savedAt": 1751000000000
+        }
+      ]
+    },
+    {
+      "id": 8233,
+      "name": "artifact-manager-session-prompt.md",
+      "desc": "Session instructions for Claude — generates artifact manager JSON at end of any conversation. Attach at start of session, trigger with 'Generate the artifact manager JSON'",
+      "folder": 6,
+      "tags": [
+        "prompt",
+        "session",
+        "workflow",
+        "markdown"
+      ],
+      "starred": true,
+      "createdAt": 1751060000000,
+      "_updatedAt": 1751060000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Full prompt with JSON format, rules, and trigger phrase",
+          "preferred": true,
+          "savedAt": 1751060000000
         }
       ]
     }
