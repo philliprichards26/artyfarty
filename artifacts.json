@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T12:47:02.615Z",
+  "exportedAt": "2026-06-28T12:50:35.726Z",
   "exportType": "full",
   "folders": [
     {
@@ -840,28 +840,6 @@
       "_updatedAt": 1782572385595
     },
     {
-      "id": 8222,
-      "name": "claude-artifact-manager-extension.zip",
-      "desc": "Chrome browser extension — sidebar on Claude.ai, token counter, artifact save/manage, IndexedDB local storage",
-      "folder": 6,
-      "tags": [
-        "chrome-extension",
-        "sidebar",
-        "token-counter"
-      ],
-      "starred": false,
-      "createdAt": 1751000000000,
-      "versions": [
-        {
-          "v": "v1",
-          "note": "Full extension — works on claude.ai in Chrome desktop",
-          "content": "",
-          "preferred": true,
-          "savedAt": 1751000000000
-        }
-      ]
-    },
-    {
       "id": 8223,
       "name": "fiche-revision-europe.html",
       "desc": "HTML revision sheet — Affirmation du projet européen, timeline 1951–2021, color-coded sections, EU aesthetics",
@@ -1266,57 +1244,11 @@
           "savedAt": 1751036000000
         }
       ]
-    },
-    {
-      "id": 8240,
-      "name": "Gantt_Vitrines_2026.xlsx",
-      "desc": "Gantt chart — 2026 vitrine planning: Gifting, Coupe du Monde, Fête des Profs, Frozettes campaigns",
-      "folder": 3,
-      "tags": [
-        "gantt",
-        "vitrines",
-        "campaigns",
-        "planning",
-        "excel"
-      ],
-      "starred": false,
-      "createdAt": 1748500000000,
-      "_updatedAt": 1748500000000,
-      "versions": [
-        {
-          "v": "v1",
-          "note": "Four campaigns, weekly view",
-          "preferred": true,
-          "savedAt": 1748500000000
-        }
-      ]
-    },
-    {
-      "id": 8241,
-      "name": "carte_visite_template.docx",
-      "desc": "Business card Word template — recto-verso 85×54mm, photo placeholders, zero margins, print-ready",
-      "folder": 7,
-      "tags": [
-        "word",
-        "business-card",
-        "template",
-        "print"
-      ],
-      "starred": false,
-      "createdAt": 1749340800000,
-      "versions": [
-        {
-          "v": "v1",
-          "note": "Two-page template with colour-coded placeholders",
-          "content": "",
-          "preferred": true,
-          "savedAt": 1749340800000
-        }
-      ]
     }
   ],
   "deletedNames": [
     "carte_visite_template.docx",
-    "Gantt_Vitrines_2026.xlsx"
+    "Gantt_Vitrines_2026.xlsx",
+    "claude-artifact-manager-extension.zip"
   ]
 }
