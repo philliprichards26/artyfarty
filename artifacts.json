@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T13:24:41.652Z",
+  "exportedAt": "2026-06-28T14:00:50.929Z",
   "exportType": "full",
   "folders": [
     {
@@ -53,7 +53,7 @@
       "id": 8201,
       "name": "phillip-artifact-manager.html",
       "desc": "Artifact Manager with Github Sync",
-      "folder": 6,
+      "folder": null,
       "tags": [
         "github",
         "sync",
@@ -61,7 +61,7 @@
       ],
       "starred": true,
       "createdAt": 1751050000000,
-      "_updatedAt": 1782653073504,
+      "_updatedAt": 1782649507076,
       "versions": [
         {
           "v": "v1",
@@ -110,6 +110,12 @@
           "note": "Claude Design light theme applied — cream background, coral accent, system font",
           "preferred": true,
           "savedAt": 1751110000000
+        },
+        {
+          "v": "v9",
+          "note": "JS syntax fix for Safari; tombstone deletion sync (DELETED set, deletedNames in payloads)",
+          "preferred": true,
+          "savedAt": 1751120000000
         }
       ]
     },
@@ -222,6 +228,12 @@
           "note": "27 artifacts — expanded from 20, adds basketball, Power Query, Gantt, SVG diagram, phillip-artifact-manager versions",
           "preferred": true,
           "savedAt": 1751065000000
+        },
+        {
+          "v": "v2",
+          "note": "Complete rebuild — 31 artifacts, full version history for all items including GitHub sync and tombstone sessions",
+          "preferred": true,
+          "savedAt": 1751130000000
         }
       ]
     },
@@ -760,6 +772,12 @@
           "savedAt": 1751000000000,
           "_fileName": "Claude_Artifact_Manager_Pitch.docx",
           "_fileSize": 15858
+        },
+        {
+          "v": "v3",
+          "note": "'Files already exist, door is locked' argument added to closing",
+          "preferred": true,
+          "savedAt": 1751040000000
         }
       ],
       "_attachedFile": {
@@ -1073,17 +1091,18 @@
     {
       "id": 8232,
       "name": "Claude_Artifact_Manager_Case_Study.docx",
-      "desc": "Case study: lost the working demo while building it — 4 failure modes, prevention table, 'Claude cannot save its own work safely' argument",
+      "desc": "Case study — ironic real-world event where the working demo was lost while building it, demonstrating the exact problem pitched to Anthropic",
       "folder": 6,
       "tags": [
+        "docx",
         "case-study",
-        "Anthropic",
-        "pitch",
+        "anthropic",
+        "artyfarty",
         "artifact-manager"
       ],
-      "starred": true,
+      "starred": false,
       "createdAt": 1751000000000,
-      "_updatedAt": 1751000000000,
+      "_updatedAt": 1751010000000,
       "versions": [
         {
           "v": "v1",
@@ -1096,23 +1115,36 @@
     {
       "id": 8233,
       "name": "artifact-manager-session-prompt.md",
-      "desc": "Session instructions for Claude — generates artifact manager JSON at end of any conversation. Attach at start of session, trigger with 'Generate the artifact manager JSON'",
+      "desc": "Session instructions for Claude — generates artifact manager JSON + downloadable files at end of any session. Two modes: live session and historical cataloguing",
       "folder": 6,
       "tags": [
+        "markdown",
         "prompt",
         "session",
         "workflow",
-        "markdown"
+        "artyfarty"
       ],
       "starred": true,
       "createdAt": 1751060000000,
-      "_updatedAt": 1751060000000,
+      "_updatedAt": 1751075000000,
       "versions": [
         {
           "v": "v1",
           "note": "Full prompt with JSON format, rules, and trigger phrase",
           "preferred": true,
           "savedAt": 1751060000000
+        },
+        {
+          "v": "v2",
+          "note": "Auto-trigger added, topic-based filename, individual file downloads",
+          "preferred": false,
+          "savedAt": 1751068000000
+        },
+        {
+          "v": "v3",
+          "note": "Two modes — live session + historical cataloguing. Slash command trigger adopted",
+          "preferred": true,
+          "savedAt": 1751075000000
         }
       ]
     },
@@ -1248,6 +1280,376 @@
         "content": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Maison Duval — Catalogue</title>\n<link href=\"https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap\" rel=\"stylesheet\">\n<style>\n  :root {\n    --cream: #f5f0e8;\n    --dark: #1a1410;\n    --gold: #b8963e;\n    --gold-light: #d4af6a;\n    --muted: #7a7268;\n    --border: #ddd5c0;\n    --card-bg: #ffffff;\n  }\n\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n\n  body {\n    font-family: 'DM Sans', sans-serif;\n    background: var(--cream);\n    color: var(--dark);\n    min-height: 100vh;\n  }\n\n  /* ── PASSWORD GATE ── */\n  #gate {\n    position: fixed; inset: 0;\n    background: var(--dark);\n    display: flex; align-items: center; justify-content: center;\n    z-index: 1000;\n    transition: opacity 0.6s ease;\n  }\n  #gate.hidden { opacity: 0; pointer-events: none; }\n\n  .gate-box {\n    text-align: center;\n    animation: fadeUp 0.7s ease both;\n  }\n  @keyframes fadeUp {\n    from { opacity: 0; transform: translateY(24px); }\n    to   { opacity: 1; transform: translateY(0); }\n  }\n\n  .gate-logo {\n    font-family: 'Playfair Display', serif;\n    font-size: 2.6rem;\n    color: var(--cream);\n    letter-spacing: 0.04em;\n    margin-bottom: 6px;\n  }\n  .gate-subtitle {\n    font-size: 0.78rem;\n    letter-spacing: 0.25em;\n    text-transform: uppercase;\n    color: var(--gold);\n    margin-bottom: 48px;\n  }\n\n  .gate-input-wrap {\n    position: relative;\n    margin-bottom: 16px;\n  }\n  #pwInput {\n    width: 280px;\n    padding: 14px 20px;\n    background: transparent;\n    border: 1px solid #4a4030;\n    color: var(--cream);\n    font-family: 'DM Sans', sans-serif;\n    font-size: 1rem;\n    letter-spacing: 0.1em;\n    outline: none;\n    transition: border-color 0.3s;\n    border-radius: 2px;\n  }\n  #pwInput:focus { border-color: var(--gold); }\n  #pwInput::placeholder { color: #5a5045; letter-spacing: 0.15em; }\n\n  #loginBtn {\n    width: 280px;\n    padding: 14px;\n    background: var(--gold);\n    border: none;\n    color: var(--dark);\n    font-family: 'DM Sans', sans-serif;\n    font-size: 0.85rem;\n    font-weight: 500;\n    letter-spacing: 0.2em;\n    text-transform: uppercase;\n    cursor: pointer;\n    border-radius: 2px;\n    transition: background 0.25s;\n  }\n  #loginBtn:hover { background: var(--gold-light); }\n\n  #gateError {\n    margin-top: 14px;\n    font-size: 0.8rem;\n    color: #e07070;\n    letter-spacing: 0.05em;\n    height: 18px;\n  }\n\n  /* ── CATALOGUE ── */\n  #catalogue { display: none; }\n  #catalogue.visible { display: block; }\n\n  header {\n    background: var(--dark);\n    padding: 20px 48px;\n    display: flex; align-items: center; justify-content: space-between;\n    position: sticky; top: 0; z-index: 100;\n    border-bottom: 1px solid #2e2820;\n  }\n  .logo {\n    font-family: 'Playfair Display', serif;\n    font-size: 1.5rem;\n    color: var(--cream);\n  }\n  .logo span { color: var(--gold); font-style: italic; }\n  .header-tag {\n    font-size: 0.7rem;\n    letter-spacing: 0.25em;\n    text-transform: uppercase;\n    color: var(--muted);\n  }\n\n  .toolbar {\n    padding: 28px 48px 0;\n    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;\n  }\n\n  .search-wrap {\n    position: relative; flex: 1; min-width: 220px; max-width: 340px;\n  }\n  .search-wrap input {\n    width: 100%;\n    padding: 10px 16px 10px 38px;\n    border: 1px solid var(--border);\n    background: white;\n    font-family: 'DM Sans', sans-serif;\n    font-size: 0.88rem;\n    color: var(--dark);\n    outline: none;\n    border-radius: 2px;\n    transition: border-color 0.2s;\n  }\n  .search-wrap input:focus { border-color: var(--gold); }\n  .search-wrap svg {\n    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);\n    color: var(--muted);\n  }\n\n  .filters { display: flex; gap: 8px; flex-wrap: wrap; }\n  .filter-btn {\n    padding: 8px 16px;\n    border: 1px solid var(--border);\n    background: white;\n    font-family: 'DM Sans', sans-serif;\n    font-size: 0.8rem;\n    color: var(--muted);\n    cursor: pointer;\n    border-radius: 2px;\n    transition: all 0.2s;\n    letter-spacing: 0.03em;\n  }\n  .filter-btn:hover { border-color: var(--gold); color: var(--dark); }\n  .filter-btn.active {\n    background: var(--gold); border-color: var(--gold);\n    color: white; font-weight: 500;\n  }\n\n  .grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));\n    gap: 24px;\n    padding: 32px 48px 64px;\n  }\n\n  .card {\n    background: var(--card-bg);\n    border: 1px solid var(--border);\n    border-radius: 3px;\n    overflow: hidden;\n    cursor: pointer;\n    transition: transform 0.2s, box-shadow 0.2s;\n    animation: cardIn 0.4s ease both;\n  }\n  @keyframes cardIn {\n    from { opacity: 0; transform: translateY(12px); }\n    to   { opacity: 1; transform: translateY(0); }\n  }\n  .card:hover {\n    transform: translateY(-3px);\n    box-shadow: 0 12px 32px rgba(0,0,0,0.1);\n  }\n\n  .card-img {\n    width: 100%; aspect-ratio: 4/3;\n    display: flex; align-items: center; justify-content: center;\n    font-size: 3rem;\n  }\n  .card-body { padding: 16px 18px 20px; }\n  .card-cat {\n    font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;\n    color: var(--gold); margin-bottom: 6px;\n  }\n  .card-name {\n    font-family: 'Playfair Display', serif;\n    font-size: 1.05rem; line-height: 1.3;\n    margin-bottom: 8px;\n  }\n  .card-ref {\n    font-size: 0.75rem; color: var(--muted);\n    margin-bottom: 12px; letter-spacing: 0.05em;\n  }\n  .card-desc {\n    font-size: 0.82rem; color: #5a5450; line-height: 1.55;\n    display: -webkit-box; -webkit-line-clamp: 2;\n    -webkit-box-orient: vertical; overflow: hidden;\n  }\n\n  /* ── MODAL ── */\n  #modal {\n    position: fixed; inset: 0;\n    background: rgba(20,16,10,0.75);\n    display: none; align-items: center; justify-content: center;\n    z-index: 200; padding: 24px;\n  }\n  #modal.open { display: flex; }\n\n  .modal-box {\n    background: white; max-width: 560px; width: 100%;\n    border-radius: 3px; overflow: hidden;\n    animation: fadeUp 0.3s ease both;\n    max-height: 90vh; overflow-y: auto;\n  }\n  .modal-img {\n    width: 100%; aspect-ratio: 16/9;\n    display: flex; align-items: center; justify-content: center;\n    font-size: 5rem;\n  }\n  .modal-body { padding: 28px 32px 36px; }\n  .modal-cat {\n    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;\n    color: var(--gold); margin-bottom: 8px;\n  }\n  .modal-name {\n    font-family: 'Playfair Display', serif;\n    font-size: 1.6rem; margin-bottom: 6px;\n  }\n  .modal-ref { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; }\n  .modal-desc { font-size: 0.92rem; line-height: 1.7; color: #3a3530; margin-bottom: 24px; }\n\n  .modal-specs {\n    display: grid; grid-template-columns: 1fr 1fr;\n    gap: 12px; border-top: 1px solid var(--border); padding-top: 20px;\n  }\n  .spec-item label {\n    font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase;\n    color: var(--muted); display: block; margin-bottom: 3px;\n  }\n  .spec-item span { font-size: 0.9rem; font-weight: 500; }\n\n  .modal-close {\n    position: sticky; top: 0; left: 100%;\n    background: var(--dark); color: var(--cream);\n    border: none; width: 36px; height: 36px;\n    display: flex; align-items: center; justify-content: center;\n    cursor: pointer; font-size: 1rem; border-radius: 0 0 0 4px;\n    margin-left: auto; z-index: 10;\n  }\n\n  .no-results {\n    grid-column: 1/-1; text-align: center; padding: 80px 0;\n    color: var(--muted); font-size: 0.95rem;\n  }\n\n  @media (max-width: 600px) {\n    header, .toolbar, .grid { padding-left: 20px; padding-right: 20px; }\n    .grid { grid-template-columns: 1fr 1fr; gap: 14px; }\n  }\n</style>\n</head>\n<body>\n\n<!-- PASSWORD GATE -->\n<div id=\"gate\">\n  <div class=\"gate-box\">\n    <div class=\"gate-logo\">Maison <span>Duval</span></div>\n    <div class=\"gate-subtitle\">Catalogue Partenaires</div>\n    <div class=\"gate-input-wrap\">\n      <input type=\"password\" id=\"pwInput\" placeholder=\"Mot de passe\" autocomplete=\"off\">\n    </div>\n    <button id=\"loginBtn\">Accéder au catalogue</button>\n    <div id=\"gateError\"></div>\n  </div>\n</div>\n\n<!-- CATALOGUE -->\n<div id=\"catalogue\">\n  <header>\n    <div class=\"logo\">Maison <span>Duval</span></div>\n    <div class=\"header-tag\">Catalogue 2026</div>\n  </header>\n\n  <div class=\"toolbar\">\n    <div class=\"search-wrap\">\n      <svg width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" viewBox=\"0 0 24 24\">\n        <circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/>\n      </svg>\n      <input type=\"text\" id=\"searchInput\" placeholder=\"Rechercher un produit...\">\n    </div>\n    <div class=\"filters\" id=\"filters\"></div>\n  </div>\n\n  <div class=\"grid\" id=\"grid\"></div>\n</div>\n\n<!-- MODAL -->\n<div id=\"modal\">\n  <div class=\"modal-box\" id=\"modalBox\">\n    <button class=\"modal-close\" id=\"modalClose\">✕</button>\n    <div class=\"modal-img\" id=\"modalImg\"></div>\n    <div class=\"modal-body\">\n      <div class=\"modal-cat\" id=\"modalCat\"></div>\n      <div class=\"modal-name\" id=\"modalName\"></div>\n      <div class=\"modal-ref\" id=\"modalRef\"></div>\n      <div class=\"modal-desc\" id=\"modalDesc\"></div>\n      <div class=\"modal-specs\" id=\"modalSpecs\"></div>\n    </div>\n  </div>\n</div>\n\n<script>\n// ── CONFIG ──────────────────────────────────────────────\nconst PASSWORD = \"duval2026\";   // ← change this\n\n// ── PRODUCT DATA ────────────────────────────────────────\nconst PRODUCTS = [\n  {\n    id: 1, ref: \"DV-BOI-001\", cat: \"Boîtes\",\n    name: \"Coffret Prestige Or\", emoji: \"🎁\",\n    bg: \"#f8f0dc\",\n    desc: \"Coffret rigide recouvert de papier texturé or avec fermeture magnétique. Idéal pour les offres premium et cadeaux d'entreprise.\",\n    specs: { Dimensions: \"30 × 20 × 8 cm\", Matière: \"Carton rigide 2mm\", Finition: \"Dorure à chaud\", Stock: \"Disponible\" }\n  },\n  {\n    id: 2, ref: \"DV-BOI-002\", cat: \"Boîtes\",\n    name: \"Boîte Fenêtre Kraft\", emoji: \"📦\",\n    bg: \"#f0e8d8\",\n    desc: \"Boîte kraft naturel avec fenêtre PET transparente. Parfaite pour la mise en valeur de produits artisanaux.\",\n    specs: { Dimensions: \"20 × 15 × 6 cm\", Matière: \"Kraft 300g\", Finition: \"Naturel\", Stock: \"Disponible\" }\n  },\n  {\n    id: 3, ref: \"DV-SAC-001\", cat: \"Sacs\",\n    name: \"Sac Ruban Ivoire\", emoji: \"🛍️\",\n    bg: \"#f5f2ec\",\n    desc: \"Sac papier grammage 120g, fond cartonné, anses ruban satin ivoire. Finition mate douce au toucher.\",\n    specs: { Dimensions: \"22 × 10 × 28 cm\", Matière: \"Papier 120g\", Anses: \"Ruban satin\", Stock: \"Disponible\" }\n  },\n  {\n    id: 4, ref: \"DV-SAC-002\", cat: \"Sacs\",\n    name: \"Sac Torsadé Noir Mat\", emoji: \"🖤\",\n    bg: \"#e8e5e0\",\n    desc: \"Sac papier noir mat premium avec cordelette torsadée noire. Sobre et élégant pour tout type de boutique.\",\n    specs: { Dimensions: \"18 × 8 × 24 cm\", Matière: \"Papier couché 150g\", Anses: \"Cordelette torsadée\", Stock: \"En cours\" }\n  },\n  {\n    id: 5, ref: \"DV-RUB-001\", cat: \"Rubans\",\n    name: \"Ruban Gros-Grain Doré\", emoji: \"🎀\",\n    bg: \"#fdf5dc\",\n    desc: \"Ruban gros-grain 25mm, coloris or, vendu en bobine de 25 mètres. Très résistant, adapté aux colis lourds.\",\n    specs: { Largeur: \"25 mm\", Longueur: \"25 m / bobine\", Matière: \"Polyester\", Stock: \"Disponible\" }\n  },\n  {\n    id: 6, ref: \"DV-RUB-002\", cat: \"Rubans\",\n    name: \"Ruban Satin Bordeaux\", emoji: \"🍷\",\n    bg: \"#f2e8e8\",\n    desc: \"Ruban satin double face 15mm, coloris bordeaux intense. Toucher doux, idéal pour les noeuds décoratifs.\",\n    specs: { Largeur: \"15 mm\", Longueur: \"50 m / bobine\", Matière: \"Satin polyester\", Stock: \"Disponible\" }\n  },\n  {\n    id: 7, ref: \"DV-PAP-001\", cat: \"Papiers\",\n    name: \"Papier de Soie Or/Blanc\", emoji: \"✨\",\n    bg: \"#fdfaf0\",\n    desc: \"Papier de soie 17g/m², bi-colore or et blanc. Vendu en feuilles 50×70 cm, lot de 25 feuilles.\",\n    specs: { Format: \"50 × 70 cm\", Grammage: \"17 g/m²\", Lot: \"25 feuilles\", Stock: \"Disponible\" }\n  },\n  {\n    id: 8, ref: \"DV-PAP-002\", cat: \"Papiers\",\n    name: \"Papier Kraft Recyclé\", emoji: \"♻️\",\n    bg: \"#ede8dc\",\n    desc: \"Papier kraft recyclé 70g/m² en rouleau. Aspect naturel, idéal pour le wrapping et les calages créatifs.\",\n    specs: { Format: \"60 cm × 50 m\", Grammage: \"70 g/m²\", Origine: \"100% recyclé\", Stock: \"Disponible\" }\n  },\n  {\n    id: 9, ref: \"DV-ACC-001\", cat: \"Accessoires\",\n    name: \"Étiquettes Cadeaux Kraft\", emoji: \"🏷️\",\n    bg: \"#f0ebe0\",\n    desc: \"Étiquettes kraft pré-découpées avec oeillets métal, lot de 50 pièces. Zone d'écriture large, corde ficelle incluse.\",\n    specs: { Format: \"6 × 9 cm\", Lot: \"50 étiquettes\", Fixation: \"Ficelle incluse\", Stock: \"Disponible\" }\n  },\n  {\n    id: 10, ref: \"DV-ACC-002\", cat: \"Accessoires\",\n    name: \"Autocollants Sceau Or\", emoji: \"⭐\",\n    bg: \"#fdf8e8\",\n    desc: \"Autocollants ronds dorés style cachet de cire, Ø 38mm. Lot de 100 stickers — effet premium et authentique.\",\n    specs: { Diamètre: \"38 mm\", Lot: \"100 stickers\", Finition: \"Dorure brillante\", Stock: \"Disponible\" }\n  },\n  {\n    id: 11, ref: \"DV-BOI-003\", cat: \"Boîtes\",\n    name: \"Boîte Cylindre Velours\", emoji: \"🧧\",\n    bg: \"#f0e8f0\",\n    desc: \"Boîte cylindrique recouverte de velours bordeaux, diamètre 12cm. Parfaite pour les bijoux et petits objets précieux.\",\n    specs: { Dimensions: \"Ø 12 × H 8 cm\", Matière: \"Velours synthétique\", Intérieur: \"Satin crème\", Stock: \"Sur commande\" }\n  },\n  {\n    id: 12, ref: \"DV-SAC-003\", cat: \"Sacs\",\n    name: \"Sac Luxe Canelle\", emoji: \"🤎\",\n    bg: \"#f5ede0\",\n    desc: \"Sac luxe cannelle avec fenêtre découpée, anses cordon tressé. Ligne haut de gamme pour boutiques de mode et cosmétiques.\",\n    specs: { Dimensions: \"25 × 12 × 30 cm\", Matière: \"Papier couché 200g\", Anses: \"Cordon tressé\", Stock: \"Disponible\" }\n  },\n];\n\nconst CATEGORIES = [\"Tous\", ...new Set(PRODUCTS.map(p => p.cat))];\n\n// ── PASSWORD LOGIC ───────────────────────────────────────\nconst gate = document.getElementById(\"gate\");\nconst catalogue = document.getElementById(\"catalogue\");\nconst pwInput = document.getElementById(\"pwInput\");\nconst loginBtn = document.getElementById(\"loginBtn\");\nconst gateError = document.getElementById(\"gateError\");\n\nfunction tryLogin() {\n  if (pwInput.value === PASSWORD) {\n    gate.classList.add(\"hidden\");\n    catalogue.classList.add(\"visible\");\n    setTimeout(() => gate.style.display = \"none\", 650);\n    renderFilters();\n    renderGrid(\"Tous\", \"\");\n  } else {\n    gateError.textContent = \"Mot de passe incorrect.\";\n    pwInput.value = \"\";\n    pwInput.focus();\n    setTimeout(() => gateError.textContent = \"\", 3000);\n  }\n}\n\nloginBtn.addEventListener(\"click\", tryLogin);\npwInput.addEventListener(\"keydown\", e => { if (e.key === \"Enter\") tryLogin(); });\n\n// ── FILTERS ──────────────────────────────────────────────\nlet activeFilter = \"Tous\";\n\nfunction renderFilters() {\n  const wrap = document.getElementById(\"filters\");\n  wrap.innerHTML = CATEGORIES.map(c =>\n    `<button class=\"filter-btn ${c === activeFilter ? 'active' : ''}\" data-cat=\"${c}\">${c}</button>`\n  ).join(\"\");\n  wrap.querySelectorAll(\".filter-btn\").forEach(btn =>\n    btn.addEventListener(\"click\", () => {\n      activeFilter = btn.dataset.cat;\n      renderFilters();\n      renderGrid(activeFilter, document.getElementById(\"searchInput\").value);\n    })\n  );\n}\n\n// ── SEARCH ───────────────────────────────────────────────\ndocument.getElementById(\"searchInput\").addEventListener(\"input\", e => {\n  renderGrid(activeFilter, e.target.value);\n});\n\n// ── GRID ─────────────────────────────────────────────────\nfunction renderGrid(cat, query) {\n  const grid = document.getElementById(\"grid\");\n  const q = query.toLowerCase().trim();\n  const items = PRODUCTS.filter(p =>\n    (cat === \"Tous\" || p.cat === cat) &&\n    (!q || p.name.toLowerCase().includes(q) || p.ref.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q))\n  );\n\n  if (!items.length) {\n    grid.innerHTML = `<div class=\"no-results\">Aucun produit trouvé.</div>`;\n    return;\n  }\n\n  grid.innerHTML = items.map((p, i) => `\n    <div class=\"card\" data-id=\"${p.id}\" style=\"animation-delay:${i * 0.04}s\">\n      <div class=\"card-img\" style=\"background:${p.bg}\">${p.emoji}</div>\n      <div class=\"card-body\">\n        <div class=\"card-cat\">${p.cat}</div>\n        <div class=\"card-name\">${p.name}</div>\n        <div class=\"card-ref\">Réf. ${p.ref}</div>\n        <div class=\"card-desc\">${p.desc}</div>\n      </div>\n    </div>\n  `).join(\"\");\n\n  grid.querySelectorAll(\".card\").forEach(card =>\n    card.addEventListener(\"click\", () => openModal(+card.dataset.id))\n  );\n}\n\n// ── MODAL ────────────────────────────────────────────────\nfunction openModal(id) {\n  const p = PRODUCTS.find(x => x.id === id);\n  if (!p) return;\n  document.getElementById(\"modalImg\").style.background = p.bg;\n  document.getElementById(\"modalImg\").textContent = p.emoji;\n  document.getElementById(\"modalCat\").textContent = p.cat;\n  document.getElementById(\"modalName\").textContent = p.name;\n  document.getElementById(\"modalRef\").textContent = \"Réf. \" + p.ref;\n  document.getElementById(\"modalDesc\").textContent = p.desc;\n  document.getElementById(\"modalSpecs\").innerHTML = Object.entries(p.specs).map(([k,v]) =>\n    `<div class=\"spec-item\"><label>${k}</label><span>${v}</span></div>`\n  ).join(\"\");\n  document.getElementById(\"modal\").classList.add(\"open\");\n}\n\ndocument.getElementById(\"modalClose\").addEventListener(\"click\", () =>\n  document.getElementById(\"modal\").classList.remove(\"open\")\n);\ndocument.getElementById(\"modal\").addEventListener(\"click\", e => {\n  if (e.target === document.getElementById(\"modal\"))\n    document.getElementById(\"modal\").classList.remove(\"open\");\n});\n</script>\n</body>\n</html>\n",
         "type": "text/html"
       }
+    },
+    {
+      "id": 8241,
+      "name": "Expeditions_Gantt_2026.xlsx",
+      "desc": "Expedition planning Gantt — weekly delivery schedule across ~100 Leonidas boutiques, Q1–Q2 overlay and colour coding",
+      "folder": 1,
+      "tags": [
+        "excel",
+        "gantt",
+        "expeditions",
+        "logistics",
+        "bilbodis"
+      ],
+      "starred": false,
+      "createdAt": 1740000000000,
+      "_updatedAt": 1740864000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Basic weekly schedule structure",
+          "preferred": false,
+          "savedAt": 1740000000000
+        },
+        {
+          "v": "v2",
+          "note": "Boutique list imported, routing logic",
+          "preferred": false,
+          "savedAt": 1740432000000
+        },
+        {
+          "v": "v3",
+          "note": "Q2 gantt overlay + colour coding finalised",
+          "preferred": true,
+          "savedAt": 1740864000000
+        }
+      ]
+    },
+    {
+      "id": 8242,
+      "name": "Production_Ballotins_Planning.xlsx",
+      "desc": "Ballotin production schedule — 250g/375g/500g lines, cadence rates, person-hours feasibility check",
+      "folder": 1,
+      "tags": [
+        "excel",
+        "production",
+        "ballotins",
+        "planning",
+        "bilbodis"
+      ],
+      "starred": false,
+      "createdAt": 1742000000000,
+      "_updatedAt": 1742345600000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Three product lines, manual cadence input",
+          "preferred": false,
+          "savedAt": 1742000000000
+        },
+        {
+          "v": "v2",
+          "note": "Feasibility logic — combined person-hours check",
+          "preferred": true,
+          "savedAt": 1742345600000
+        }
+      ]
+    },
+    {
+      "id": 8243,
+      "name": "Tarif_Transport_Comparatif.xlsx",
+      "desc": "Carrier rate comparison — T1 vs T2 pricing logic, weight brackets, palette surcharges, CNR fuel formula `26 × ((P/0.8)−1)`",
+      "folder": 1,
+      "tags": [
+        "excel",
+        "transport",
+        "tarif",
+        "carriers",
+        "cnr",
+        "bilbodis"
+      ],
+      "starred": false,
+      "createdAt": 1743000000000,
+      "_updatedAt": 1743518400000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "T1 table structure",
+          "preferred": false,
+          "savedAt": 1743000000000
+        },
+        {
+          "v": "v2",
+          "note": "T2 added + comparison columns",
+          "preferred": false,
+          "savedAt": 1743259200000
+        },
+        {
+          "v": "v3",
+          "note": "CNR fuel formula integrated — client preferred",
+          "preferred": true,
+          "savedAt": 1743518400000
+        },
+        {
+          "v": "v4",
+          "note": "T1 double pricing edge case confirmed",
+          "preferred": false,
+          "savedAt": 1743600000000
+        }
+      ]
+    },
+    {
+      "id": 8244,
+      "name": "KPI_Dashboard_Bilbodis.xlsx",
+      "desc": "Weekly operational KPI dashboard — expedition volumes, incidents, delivery performance metrics",
+      "folder": 1,
+      "tags": [
+        "excel",
+        "kpi",
+        "dashboard",
+        "weekly",
+        "bilbodis"
+      ],
+      "starred": false,
+      "createdAt": 1745000000000,
+      "_updatedAt": 1745000000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Initial KPI structure — expedition volumes + incidents",
+          "preferred": true,
+          "savedAt": 1745000000000
+        }
+      ]
+    },
+    {
+      "id": 8245,
+      "name": "incidents-boutiques.html",
+      "desc": "Boutique incident reporting form — client autocomplete (90-shop dataset), category taxonomy, CSV export",
+      "folder": 1,
+      "tags": [
+        "html",
+        "incidents",
+        "boutiques",
+        "reporting",
+        "bilbodis"
+      ],
+      "starred": false,
+      "createdAt": 1746500000000,
+      "_updatedAt": 1746846400000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Basic incident form",
+          "preferred": false,
+          "savedAt": 1746500000000
+        },
+        {
+          "v": "v2",
+          "note": "Client autocomplete — 90-shop dataset",
+          "preferred": false,
+          "savedAt": 1746673600000
+        },
+        {
+          "v": "v3",
+          "note": "Category taxonomy + CSV export",
+          "preferred": true,
+          "savedAt": 1746846400000
+        }
+      ]
+    },
+    {
+      "id": 8246,
+      "name": "Gantt_Vitrines_2026.xlsx",
+      "desc": "Gantt chart — 2026 vitrine planning: Gifting, Coupe du Monde, Fête des Profs, Frozettes campaigns",
+      "folder": 3,
+      "tags": [
+        "excel",
+        "gantt",
+        "vitrines",
+        "campaigns",
+        "planning",
+        "bilbodis"
+      ],
+      "starred": false,
+      "createdAt": 1748500000000,
+      "_updatedAt": 1748500000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Four campaigns, weekly view",
+          "preferred": true,
+          "savedAt": 1748500000000
+        }
+      ]
+    },
+    {
+      "id": 8247,
+      "name": "index-v3.html",
+      "desc": "ArtyFarty mobile-first PWA — localStorage (not IndexedDB), save/version/star/folder/tag, file attach, rebuild prompt, JSON export/import. Deployed to artyfarty.netlify.app/pwa/",
+      "folder": 6,
+      "tags": [
+        "html",
+        "pwa",
+        "mobile",
+        "localStorage",
+        "artyfarty",
+        "artifact-manager"
+      ],
+      "starred": true,
+      "createdAt": 1750980000000,
+      "_updatedAt": 1750980000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "IndexedDB version — had blocking issues on HTTP/Firefox (broken)",
+          "preferred": false,
+          "savedAt": 1750960000000
+        },
+        {
+          "v": "v2",
+          "note": "Switched to localStorage — works on HTTP, HTTPS, Firefox, Chrome, Android",
+          "preferred": false,
+          "savedAt": 1750970000000
+        },
+        {
+          "v": "v3",
+          "note": "Full features: 📎 Attach, 🤖 Rebuild prompt, folder icons, preferred marker, Settings stats",
+          "preferred": true,
+          "savedAt": 1750980000000
+        }
+      ]
+    },
+    {
+      "id": 8248,
+      "name": "claude-artifact-manager-extension.zip",
+      "desc": "Chrome browser extension — sidebar on claude.ai with token counter (~4 chars/token), conversation naming, artifact save with version/tags/folder. HTTPS only",
+      "folder": 6,
+      "tags": [
+        "chrome-extension",
+        "sidebar",
+        "token-counter",
+        "claude.ai",
+        "artyfarty"
+      ],
+      "starred": false,
+      "createdAt": 1751000000000,
+      "_updatedAt": 1751000000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Full extension — works on claude.ai in Chrome desktop over HTTPS only",
+          "preferred": true,
+          "savedAt": 1751000000000
+        }
+      ]
+    },
+    {
+      "id": 8249,
+      "name": "historic-artifacts.json",
+      "desc": "First catalogue of 20 real artifacts reconstructed from Phillip's conversation history — correct folders, versions, tags, preferred markers. Import via PWA Settings",
+      "folder": 6,
+      "tags": [
+        "json",
+        "catalogue",
+        "historic",
+        "artyfarty"
+      ],
+      "starred": false,
+      "createdAt": 1750990000000,
+      "_updatedAt": 1750990000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "20 artifacts — Bilbodis, FrameStay, and Artifact Manager sessions",
+          "preferred": true,
+          "savedAt": 1750990000000
+        }
+      ]
+    },
+    {
+      "id": 8250,
+      "name": "versioned-file-edits/SKILL.md",
+      "desc": "Claude Skill — never overwrite a file without saving a versioned copy first. Keeps last version for rollback. Validates syntax before presenting. str_replace for small changes, fresh files for large rebuilds",
+      "folder": 6,
+      "tags": [
+        "markdown",
+        "skill",
+        "versioning",
+        "workflow",
+        "artyfarty"
+      ],
+      "starred": false,
+      "createdAt": 1751125000000,
+      "_updatedAt": 1751125000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "Drafted but not yet finalised with revised approach (keep only last version, not full history)",
+          "preferred": true,
+          "savedAt": 1751125000000
+        }
+      ]
+    },
+    {
+      "id": 8251,
+      "name": "test-artifacts.json",
+      "desc": "Test dataset — 7 artifacts across all 7 real folders for testing import, export, delta, and restore flows in the Artifact Manager",
+      "folder": 6,
+      "tags": [
+        "json",
+        "test",
+        "dataset",
+        "artyfarty"
+      ],
+      "starred": false,
+      "createdAt": 1751060000000,
+      "_updatedAt": 1751060000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "7 artifacts with versions and preferred markers — validates full/delta/merge/restore cycle",
+          "preferred": true,
+          "savedAt": 1751060000000
+        }
+      ]
+    },
+    {
+      "id": 8252,
+      "name": "session-summary-2026-06-27-pitch-and-pwa.md",
+      "desc": "Session summary — evening session producing full Anthropic pitch package (Pitch.docx, Case_Study.docx, Vortex demo, PWA, Chrome extension, historic-artifacts.json)",
+      "folder": 6,
+      "tags": [
+        "markdown",
+        "session-summary",
+        "artyfarty"
+      ],
+      "starred": false,
+      "createdAt": 1750999000000,
+      "_updatedAt": 1750999000000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "6-hour session summary — all 6 files produced, next task defined",
+          "preferred": true,
+          "savedAt": 1750999000000
+        }
+      ]
+    },
+    {
+      "id": 8253,
+      "name": "session-summary-2026-06-28-github-sync.md",
+      "desc": "Session summary — GitHub Push/Pull sync implementation, PAT setup, folder modal bug fix, JS syntax error debugging and rebuild",
+      "folder": 6,
+      "tags": [
+        "markdown",
+        "session-summary",
+        "github",
+        "artyfarty"
+      ],
+      "starred": false,
+      "createdAt": 1751118600000,
+      "_updatedAt": 1751118600000,
+      "versions": [
+        {
+          "v": "v1",
+          "note": "GitHub sync session summary — push/pull working, Safari SyntaxError unresolved at session end",
+          "preferred": true,
+          "savedAt": 1751118600000
+        }
+      ]
     }
   ]
 }
