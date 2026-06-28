@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T12:21:50.630Z",
+  "exportedAt": "2026-06-28T12:23:13.642Z",
   "exportType": "full",
   "folders": [
     {
@@ -168,7 +168,7 @@
       "id": 8203,
       "name": "Artifact Prompt Skill.md",
       "desc": "Claude Skill for artifact tracking — two modes: live session (slash command trigger) and historical cataloguing (attach to old conversation). Produces delta JSON + individual downloadable files. Installed at artifact-manager-session-tracker",
-      "folder": null,
+      "folder": 6,
       "tags": [
         "skill",
         "prompt",
@@ -178,7 +178,7 @@
       ],
       "starred": true,
       "createdAt": 1751062000000,
-      "_updatedAt": 1751080000000,
+      "_updatedAt": 1782649388061,
       "versions": [
         {
           "v": "v1",
@@ -210,7 +210,7 @@
       "id": 8204,
       "name": "artifacts-full-complete.json",
       "desc": "Comprehensive full catalogue — 27 artifacts from deep conversation history search. Bilbodis, FrameStay, Artifact Manager folders. Base catalogue for the manager",
-      "folder": null,
+      "folder": 6,
       "tags": [
         "json",
         "catalogue",
@@ -219,7 +219,7 @@
       ],
       "starred": true,
       "createdAt": 1751065000000,
-      "_updatedAt": 1751065000000,
+      "_updatedAt": 1782649384558,
       "versions": [
         {
           "v": "v1",
@@ -233,7 +233,7 @@
       "id": 8205,
       "name": "artifacts-delta-2026-06-28-artyfarty-interface-build.json",
       "desc": "Delta export for this session — phillip-artifact-manager light theme, vortex demo reskin, skill v4, follow-up email copy",
-      "folder": null,
+      "folder": 6,
       "tags": [
         "json",
         "delta",
@@ -241,7 +241,7 @@
       ],
       "starred": false,
       "createdAt": 1751110000000,
-      "_updatedAt": 1751110000000,
+      "_updatedAt": 1782649381384,
       "versions": [
         {
           "v": "v1",
