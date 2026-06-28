@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-28T16:58:43.033Z",
+  "exportedAt": "2026-06-28T16:59:11.824Z",
   "exportType": "full",
   "folders": [
     {
@@ -59,7 +59,7 @@
       "id": 8201,
       "name": "phillip-artifact-manager.html",
       "desc": "Artifact Manager with Github Sync",
-      "folder": null,
+      "folder": 6,
       "tags": [
         "github",
         "sync",
@@ -67,7 +67,7 @@
       ],
       "starred": true,
       "createdAt": 1751050000000,
-      "_updatedAt": 1782665668627,
+      "_updatedAt": 1782665935903,
       "versions": [
         {
           "v": "v1",
@@ -129,7 +129,7 @@
       "id": 8202,
       "name": "vortex-artifact-manager-demo.html",
       "desc": "Large-scale fictional company demo — Vortex Dynamics, 58 artifacts, 203 versions, 7 team members, 5 departments",
-      "folder": null,
+      "folder": 9,
       "tags": [
         "demo",
         "Vortex",
@@ -138,7 +138,7 @@
       ],
       "starred": true,
       "createdAt": 1751000000000,
-      "_updatedAt": 1782665730806,
+      "_updatedAt": 1782665948061,
       "versions": [
         {
           "v": "v1",
@@ -923,7 +923,7 @@
       "id": 8226,
       "name": "build_catalogue.py",
       "desc": "Python script using openpyxl + ReportLab to parse the 5-column Leonidas NCOM Excel catalogue and render a multi-section A4 PDF with custom page templates, numbered canvas, TOC, and branded colour palette.",
-      "folder": null,
+      "folder": 2,
       "tags": [
         "python",
         "reportlab",
@@ -935,7 +935,7 @@
       ],
       "starred": false,
       "createdAt": 1751057100000,
-      "_updatedAt": 1782665664652,
+      "_updatedAt": 1782665932305,
       "versions": [
         {
           "v": "v1",
@@ -1158,7 +1158,7 @@
       "id": 8236,
       "name": "Planning_Ballotins.xlsx",
       "desc": "Weekly ballotin production planner v1 — fixed person count per line per day, with targets, % complete and colour-coded KPIs for 250g/375g/500g formats.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1169,7 +1169,7 @@
       ],
       "starred": false,
       "createdAt": 1751030400000,
-      "_updatedAt": 1782665679153,
+      "_updatedAt": 1782665945461,
       "versions": [
         {
           "v": "v1",
@@ -1183,7 +1183,7 @@
       "id": 8237,
       "name": "Planning_Ballotins_v2.xlsx",
       "desc": "Weekly ballotin planner v2 — dual input per format per day (hours + people), production calculated as H × P × cadence, daily person-hour validation.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1194,7 +1194,7 @@
       ],
       "starred": false,
       "createdAt": 1751032200000,
-      "_updatedAt": 1782665681408,
+      "_updatedAt": 1782665943059,
       "versions": [
         {
           "v": "v1",
@@ -1208,7 +1208,7 @@
       "id": 8238,
       "name": "Planning_Ballotins_v3.xlsx",
       "desc": "Weekly ballotin planner v3 — single person-hours input per format per day, production = ph × cadence, max 35ph/day validation, 375g+500g conflict check.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1219,7 +1219,7 @@
       ],
       "starred": false,
       "createdAt": 1751034000000,
-      "_updatedAt": 1782665685939,
+      "_updatedAt": 1782665940927,
       "versions": [
         {
           "v": "v1",
@@ -1233,7 +1233,7 @@
       "id": 8239,
       "name": "Planning_Ballotins_v4.xlsx",
       "desc": "Weekly ballotin planner v4 — person-hours input per format per day, combined faisabilité row showing total ph needed across all formats and whether targets are achievable within the 5-day week.",
-      "folder": null,
+      "folder": 3,
       "tags": [
         "excel",
         "production",
@@ -1244,7 +1244,7 @@
       ],
       "starred": true,
       "createdAt": 1751036000000,
-      "_updatedAt": 1782665688608,
+      "_updatedAt": 1782665938692,
       "versions": [
         {
           "v": "v1",
